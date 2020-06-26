@@ -1,9 +1,11 @@
 import cuid from 'https://cdn.pika.dev/cuid'
 import { define, html } from 'https://cdn.pika.dev/uce'
-import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
+import { PAGE_FOLDER, PAGE_ICON, PAGE_TITLE, TRASH_FOLDER } from '../constants.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
+
+const isTrashed = pathname.startsWith(TRASH_FOLDER, 1)
 
 define('hw-root', {
   async init () {
@@ -57,12 +59,25 @@ define('hw-root', {
               <dl>
                 <dt>Related pages</dt>
                 ${linkRefsHTML}
-                <dd><button onclick=${handleAddLink} type='button'>Add link</button></dd>
+                <dd>
+                  <button onclick=${handleAddLink} type='button'>
+                    <hw-icon name='plus' />
+                    Add link
+                  </button>
+                </dd>
                 <dt>Created</dt>
                 <dd>🕓 ${dateFormat(ctime)}</dt>
                 <dt>Updated</dt>
                 <dd>🕓 ${dateFormat(mtime)}</dt>
               </dl>
+              <div class='padding-t-4'>
+                <button .hidden=${isTrashed} onclick=${handleDeletePage} type='button'>
+                  Delete
+                </button>
+                <button .hidden=${!isTrashed} onclick=${handleRestorePage} type='button'>
+                  Restore
+                </button>
+              </div>
             </footer>
           </div>
         </article>
@@ -74,8 +89,22 @@ define('hw-root', {
 
 async function handleNewPage () {
   const { url } = await beaker.hyperdrive.getInfo(pathname)
-  const fileUrl = `${url}pages/${cuid()}.md`
+  const fileUrl = `${url}${PAGE_FOLDER}/${cuid()}.md`
   await beaker.hyperdrive.writeFile(fileUrl, '')
+  window.location = fileUrl
+}
+
+async function handleDeletePage () {
+  const fileName = pathname.split('/').reverse()[0]
+  const fileUrl = `/${TRASH_FOLDER}/${fileName}`
+  await beaker.hyperdrive.rename(pathname, fileUrl)
+  window.location = fileUrl
+}
+
+async function handleRestorePage () {
+  const fileName = pathname.split('/').reverse()[0]
+  const fileUrl = `/${PAGE_FOLDER}/${fileName}`
+  await beaker.hyperdrive.rename(pathname, fileUrl)
   window.location = fileUrl
 }
 
