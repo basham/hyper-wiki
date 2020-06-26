@@ -50,13 +50,13 @@ define('hw-root', {
             </article>
             <footer class='page__info padding-4'>
               <dl>
-                <dt>Created</dt>
-                <dd>🕓 ${dateFormat(ctime)}</dt>
-                <dt>Modified</dt>
-                <dd>🕓 ${dateFormat(mtime)}</dt>
-                <dt>Links</dt>
+                <dt>Related pages</dt>
                 ${linkRefsHTML}
                 <dd><button onclick=${handleAddLink} type='button'>Add link</button></dd>
+                <dt>Created</dt>
+                <dd>🕓 ${dateFormat(ctime)}</dt>
+                <dt>Updated</dt>
+                <dd>🕓 ${dateFormat(mtime)}</dt>
               </dl>
             </footer>
           </div>
