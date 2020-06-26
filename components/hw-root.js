@@ -42,7 +42,7 @@ define('hw-root', {
           </ol>
         </nav>
         <div>
-          <button onclick=${handleNewPage}>
+          <button onclick=${handleNewPage} type='button'>
             <hw-icon name='plus' />
             New page
           </button>
@@ -70,7 +70,10 @@ define('hw-root', {
                 <dt>Updated</dt>
                 <dd>🕓 ${dateFormat(mtime)}</dt>
               </dl>
-              <div class='padding-t-4'>
+              <div class='flex-gap-2 padding-t-4'>
+                <button class='' onclick=${handleMovePage} type='button'>
+                  Move
+                </button>
                 <button .hidden=${isTrashed} onclick=${handleDeletePage} type='button'>
                   Delete
                 </button>
@@ -92,6 +95,25 @@ async function handleNewPage () {
   const fileUrl = `${url}${PAGE_FOLDER}/${cuid()}.md`
   await beaker.hyperdrive.writeFile(fileUrl, '')
   window.location = fileUrl
+}
+
+async function handleMovePage () {
+  const info = await beaker.hyperdrive.getInfo(pathname)
+  const files = await beaker.shell.selectFileDialog({
+    title: 'Select Page',
+    buttonLabel: 'Select',
+    drive: info.url,
+    select: ['file'],
+    filters: {
+      extensions: ['md', 'html']
+    },
+    allowMultiple: false,
+    disallowCreate: true
+  })
+  const { path } = files[0]
+  await beaker.hyperdrive.updateMetadata(pathname, {
+    parent: path
+  })
 }
 
 async function handleDeletePage () {

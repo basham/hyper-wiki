@@ -150,6 +150,14 @@ button > hw-icon {
   display: flex;
 }
 
+.flex-gap-2 {
+  margin: calc(var(--size-1) * -1);
+}
+
+.flex-gap-2 > * {
+  margin: var(--size-1);
+}
+
 .flex-grow {
   flex-grow: 1;
 }
