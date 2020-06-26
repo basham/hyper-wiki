@@ -1,0 +1,88 @@
+:root {
+  --color-blue: #0074d9; /* 511/1000 */
+  --color-blue-6: #0f6ac6; /* 550/1000 */
+  --color-blue-9: #18253f; /* 850/1000 */
+
+  --color-black: #000000;
+  --color-black-0: #f0f1f3; /* 50/1000 */
+  --color-black-1: #e1e2e6;
+  --color-black-3: #a8abb7;
+  --color-black-8: #253049;
+  --color-black-9: #0e111a; /* 950/1000 */
+
+  --space-1: .5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 2.5rem;
+  --space-6: 3rem;
+  --space-7: 3.5rem;
+  --space-8: 4rem;
+}
+
+body {
+  color: var(--color-blue-9);
+  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+a:link {
+  color: var(--color-black);
+}
+
+a:hover {
+  color: var(--color-blue-6);
+}
+
+.list-plain {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-pagination li:not(:last-child)::after {
+  color: var(--color-black-3);
+  content: '/';
+  padding: 0 var(--space-1);
+}
+
+.icon {
+  font-size: 4rem;
+  margin-bottom: -1rem;
+}
+
+/* Utils */
+
+.border-bottom {
+  border-bottom: calc(1rem/16) solid var(--color-black-1);
+}
+
+.flex-center {
+  align-items: center;
+  display: flex;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.padding-b-2 {
+  padding-bottom: var(--space-2);
+}
+
+.padding-t-4 {
+  padding-top: var(--space-4);
+}
+
+.padding-2 {
+  padding: var(--space-2);
+}
+
+.padding-4 {
+  padding: var(--space-4);
+}
+
+.padding-8 {
+  padding: var(--space-8);
+}
