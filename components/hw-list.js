@@ -3,7 +3,7 @@ import { define, html } from 'https://cdn.pika.dev/uce'
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
 
-define('cb-list', {
+define('hw-list', {
   async init () {
     const files = await beaker.hyperdrive.query({
       path: 'journal/*.md',
