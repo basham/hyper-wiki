@@ -38,7 +38,10 @@ define('hw-root', {
           </ol>
         </nav>
         <div>
-          <button>New page</button>
+          <button>
+            <hw-icon name='plus' />
+            New page
+          </button>
         </div>
       </header>
       <main>
