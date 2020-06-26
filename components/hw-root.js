@@ -1,4 +1,6 @@
+import cuid from 'https://cdn.pika.dev/cuid'
 import { define, html } from 'https://cdn.pika.dev/uce'
+import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
@@ -7,7 +9,7 @@ define('hw-root', {
   async init () {
     const info = await beaker.hyperdrive.getInfo(pathname)
     const { ctime, mtime, metadata } = await beaker.hyperdrive.stat(pathname)
-    const { icon = '', title = pathname, links = '[]' } = metadata
+    const { icon = PAGE_ICON, title = PAGE_TITLE, links = '[]' } = metadata
 
     document.title = [title, info.title].filter((v) => v).join(' - ')
     document.getElementById('favicon').href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icon}</text></svg>`
@@ -38,7 +40,7 @@ define('hw-root', {
           </ol>
         </nav>
         <div>
-          <button>
+          <button onclick=${handleNewPage}>
             <hw-icon name='plus' />
             New page
           </button>
@@ -69,6 +71,13 @@ define('hw-root', {
     this.querySelector('.page__content').innerHTML = page
   }
 })
+
+async function handleNewPage () {
+  const { url } = await beaker.hyperdrive.getInfo(pathname)
+  const fileUrl = `${url}pages/${cuid()}.md`
+  await beaker.hyperdrive.writeFile(fileUrl, '')
+  window.location = fileUrl
+}
 
 async function handleAddLink () {
   const info = await beaker.hyperdrive.getInfo(pathname)
