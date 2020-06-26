@@ -1,8 +1,5 @@
 import { define, html } from 'https://cdn.pika.dev/uce'
 
-let pathname = location.pathname
-if (pathname.endsWith('/')) pathname += 'index.html'
-
 define('hw-list', {
   async init () {
     const files = await beaker.hyperdrive.query({
@@ -11,14 +8,13 @@ define('hw-list', {
       sort: 'name',
       type: 'file'
     })
-    this.html`<ul>${files.map(renderItem)}</ul>`
+    this.html`<ul class='list-plain'>${files.map(renderItem)}</ul>`
   }
 })
 
 function renderItem (props) {
-  const { path, stat } = props
-  const { icon, title } = stat.metadata
+  const { path } = props
   return html`
-    <li><a href=${path}>${icon} ${title}</a></li>
+    <li><a href=${path} is='hw-link'></a></li>
   `
 }
