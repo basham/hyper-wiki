@@ -16,6 +16,11 @@ define('hw-root', {
     document.title = [title, info.title].filter((v) => v).join(' - ')
     document.getElementById('favicon').href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icon}</text></svg>`
 
+    const breadcrumbs = await getBreadcrumbs(pathname)
+    const breadcrumbsHTML = breadcrumbs.map((path) =>
+      html`<li><a href=${path} is='hw-link'></a></li>`
+    )
+
     const linkRefs = await beaker.hyperdrive.query({
       path: JSON.parse(links)
     })
@@ -27,21 +32,33 @@ define('hw-root', {
         </dd>`
       )
 
+    const subpages = await beaker.hyperdrive.query({
+      metadata: { parent: location.pathname },
+      path: '*/*',
+      reverse: true,
+      sort: 'name',
+      type: 'file'
+    })
+    const subpagesHTML = subpages.map(({ path }) =>
+      html`<dd><a href=${path} is='hw-link'></a></dd>`
+    )
+
     const page = await parsePage()
 
     this.html`
-      <header class='flex-center border-bottom padding-2'>
+      <header class='flex-center flex-wrap border-bottom padding-1'>
         <nav aria-label='Breadcrumbs' class='flex-grow'>
-          <ol class='list-plain list-pagination flex-center'>
+          <ol class='list-plain list-pagination flex-center flex-wrap lh-4 padding-1'>
             <li>
               <a href='/'>${info.title}</a>
             </li>
+            ${breadcrumbsHTML}
             <li aria-current='page'>
               <a href='${pathname}' is='hw-link'></a>
             </li>
           </ol>
         </nav>
-        <div>
+        <div class='flex-center flex-wrap padding-1'>
           <button onclick=${handleNewPage} type='button'>
             <hw-icon name='plus' />
             New page
@@ -65,6 +82,8 @@ define('hw-root', {
                     Add link
                   </button>
                 </dd>
+                <dt>Subpages</dt>
+                ${subpagesHTML}
                 <dt>Created</dt>
                 <dd>🕓 ${dateFormat(ctime)}</dt>
                 <dt>Updated</dt>
@@ -90,6 +109,16 @@ define('hw-root', {
   }
 })
 
+async function getBreadcrumbs (path) {
+  const stat = await beaker.hyperdrive.stat(path)
+  const { parent } = stat.metadata
+  if (parent) {
+    const parentPaths = await getBreadcrumbs(parent)
+    return [ ...parentPaths, parent ]
+  }
+  return []
+}
+
 async function handleNewPage () {
   const { url } = await beaker.hyperdrive.getInfo(pathname)
   const fileUrl = `${url}${PAGE_FOLDER}/${cuid()}.md`
@@ -114,6 +143,7 @@ async function handleMovePage () {
   await beaker.hyperdrive.updateMetadata(pathname, {
     parent: path
   })
+  window.location.reload()
 }
 
 async function handleDeletePage () {
