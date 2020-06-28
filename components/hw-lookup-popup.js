@@ -18,6 +18,9 @@ define('hw-lookup-popup', {
 
     .${cn} .popup {
       background-color: var(--color-white);
+      box-shadow:
+        0 var(--px-1) 0 0 var(--color-black-2),
+        0 var(--size-1) var(--size-2) 0 var(--color-shadow-1);
     }
 
     .${cn} .popup__icon {
@@ -126,7 +129,7 @@ define('hw-lookup-popup', {
     const selectedId = selectedOption ? selectedOption.id : null
     render(this._container, html`
       <form
-        class='popup border-bottom padding-1'
+        class='popup padding-1'
         onsubmit=${this.handleFormSubmit.bind(this)}
         tabindex='-1'>
         <div class='flex'>
