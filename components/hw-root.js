@@ -116,9 +116,10 @@ define('hw-root', {
   }
 })
 
-function handleLookup (event) {
+async function handleLookup (event) {
   const { popup } = event.target.dataset
-  document.getElementById(popup).open()
+  const v = await document.getElementById(popup).open()
+  console.log('$$', v)
 }
 
 async function getBreadcrumbs (path) {

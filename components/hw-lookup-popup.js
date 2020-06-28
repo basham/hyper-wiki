@@ -79,6 +79,10 @@ define('hw-lookup-popup', {
     this._options = this._allOptions
     this._selectedIndex = 0
     this.render()
+    return new Promise((function (resolve, reject) {
+      this._resolve = resolve
+      this._reject = reject
+    }).bind(this))
   },
   close () {
     if (!this._isOpen) {
@@ -87,6 +91,11 @@ define('hw-lookup-popup', {
     this._isOpen = false
     this._container.remove()
     this._activeElement.focus()
+    if (this._value) {
+      this._resolve(this._value)
+    } else {
+      this._reject('No value selected')
+    }
   },
   render () {
     const { label } = this.props
@@ -168,6 +177,7 @@ define('hw-lookup-popup', {
         this.render()
         return
       case 'Enter':
+        this._value = this._optionsCount ? this._options[i].path : null
         this.close()
         return
       case 'Escape':
@@ -176,6 +186,10 @@ define('hw-lookup-popup', {
           return
         }
     }
+  },
+  handleOptionClick () {
+    this._value = this._options[this._selectedIndex].path
+    this.close()
   },
   handleOptionMouseOver (event) {
     this._selectedIndex = parseInt(event.target.dataset.index)
@@ -191,10 +205,11 @@ function renderOption (props, index) {
       aria-selected=${selected}
       class='popup__option border-radius flex'
       data-index=${index}
+      onclick=${this.handleOptionClick.bind(this)}
       onmouseover=${this.handleOptionMouseOver.bind(this)}
       role='option'>
-      <span>${icon}</span>
-      <span class='flex flex-wrap'>
+      <span class='no-pointer-events'>${icon}</span>
+      <span class='flex flex-wrap no-pointer-events'>
         <span class='padding-l-1'>${title}</span>
         ${renderParent(props)}
       </span>
