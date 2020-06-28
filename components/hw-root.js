@@ -85,9 +85,6 @@ define('hw-root', {
                     <hw-icon name='plus' />
                     Lookup
                   </button>
-                  <hw-lookup-popup
-                    id='lookup'
-                    label='Add related page' />
                 </dd>
                 <dt>Subpages</dt>
                 ${subpagesHTML}
@@ -111,6 +108,9 @@ define('hw-root', {
           </div>
         </article>
       </main>
+      <hw-lookup-popup
+        id='lookup'
+        label='Add related page' />
     `
     this.querySelector('.page__content').innerHTML = page
   }
