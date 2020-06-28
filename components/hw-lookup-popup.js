@@ -9,9 +9,11 @@ define('hw-lookup-popup', {
     .${cn} {
       height: 100vh;
       left: 0;
-      position: absolute;
+      overflow: auto;
+      position: fixed;
       top: 0;
       width: 100vw;
+      z-index: 1;
     }
 
     .${cn} .popup {
@@ -62,6 +64,7 @@ define('hw-lookup-popup', {
     this._container = document.createElement('div')
     this._container.classList.add(cn)
     this._container.addEventListener('click', this.cancelByContainer.bind(this))
+    document.body.style.overflow = 'hidden'
     document.body.append(this._container)
     const pages = await beaker.hyperdrive.query({
       path: '*/*.md',
@@ -113,6 +116,7 @@ define('hw-lookup-popup', {
     }
     this._isOpen = false
     this._container.remove()
+    document.body.style.overflow = ''
     this._activeElement.focus()
   },
   render () {
