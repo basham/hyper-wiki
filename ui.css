@@ -99,7 +99,7 @@ p:not(:first-child) {
 button {
   align-items: center;
   background-color: var(--color-black-0);
-  border: var(--px-1) solid var(--color-black-1);
+  border: var(--px-2) solid var(--color-black-1);
   border-radius: var(--size-0);
   color: var(--color-black-7);
   cursor: pointer;
@@ -122,8 +122,32 @@ button:active {
   color: var(--color-black-8);
 }
 
+button:focus {
+  border-color: var(--color-blue-6);
+  outline: none;
+}
+
 button > hw-icon {
   padding-right: var(--size-0);
+}
+
+.button-icon {
+  background-color: transparent;
+  border: var(--px-2) solid transparent;
+  color: var(--color-black-6);
+  padding: 0 var(--px-2);
+}
+
+.button-icon:hover {
+  background-color: var(--color-black-0);
+}
+
+.button-icon:hover:not(:focus) {
+  border-color: transparent;
+}
+
+.button-icon > hw-icon {
+  padding: 0;
 }
 
 input[type="search"],

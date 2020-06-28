@@ -29,14 +29,12 @@ define('hw-lookup-popup', {
       padding: var(--px-6) var(--size-2);
     }
 
-    .${cn} .popup__option:hover,
     .${cn} .popup__option[aria-selected="true"] {
       background-color: var(--color-blue-6);
       color: var(--color-white);
       cursor: pointer;
     }
 
-    .${cn} .popup__option:hover .popup__option-small,
     .${cn} .popup__option[aria-selected="true"] .popup__option-small {
       color: var(--color-white);
     }
@@ -47,7 +45,13 @@ define('hw-lookup-popup', {
   `,
   init () {
     this._isOpen = false
-    this._id = cuid()
+    const id = cuid()
+    this._ids = {
+      id,
+      inputId: `${this._id}-input`,
+      labelId: `${this._id}-label`,
+      listboxId: `${this._id}-listbox`
+    }
   },
   async open () {
     if (this.isOpen) {
@@ -57,6 +61,7 @@ define('hw-lookup-popup', {
     this._activeElement = document.activeElement
     this._container = document.createElement('div')
     this._container.classList.add(cn)
+    this._container.addEventListener('click', this.cancelByContainer.bind(this))
     document.body.append(this._container)
     const pages = await beaker.hyperdrive.query({
       path: '*/*.md',
@@ -76,48 +81,70 @@ define('hw-lookup-popup', {
       const parentPage = hasParent ? pagesIndex.get(page.parent) : null
       return { ...page, hasParent, parentPage }
     })
-    this._options = this._allOptions
-    this._selectedIndex = 0
-    this.render()
+    this.setOptions(this._allOptions)
+    document.getElementById(this._ids.inputId).focus()
     return new Promise((function (resolve, reject) {
       this._resolve = resolve
       this._reject = reject
     }).bind(this))
   },
-  close () {
+  resolve () {
+    const selectedOption = this.getSelectedOption()
+    if (selectedOption) {
+      this.exit()
+      this._resolve(selectedOption.path)
+    }
+    else {
+      this.cancel()
+    }
+  },
+  cancel () {
+    this.exit()
+    this._reject('No value selected')
+  },
+  cancelByContainer (event) {
+    if (event.target === this._container) {
+      this.cancel()
+    }
+  },
+  exit () {
     if (!this._isOpen) {
       return
     }
     this._isOpen = false
     this._container.remove()
     this._activeElement.focus()
-    if (this._value) {
-      this._resolve(this._value)
-    } else {
-      this._reject('No value selected')
-    }
   },
   render () {
     const { label } = this.props
-    const labelId = `${this._id}-label`
-    const inputId = `${this._id}-input`
-    const listboxId = `${this._id}-listbox`
-    this._optionsCount = this._options.length
-    const hasOptions = this._optionsCount > 0
-    const selectedId = this._selectedIndex && hasOptions ? this._options[this._selectedIndex].id : null
+    const { inputId, labelId, listboxId } = this._ids
+    const selectedOption = this.getSelectedOption()
+    const selectedId = selectedOption ? selectedOption.id : null
     render(this._container, html`
-      <div
+      <form
         class='popup border-bottom padding-1'
+        onsubmit=${this.handleFormSubmit.bind(this)}
         tabindex='-1'>
-        <h1 class='fs-2 lh-3 padding-1'>
-          <label
-            for=${inputId}
-            id=${labelId}>
-            ${label}
-          </label>
-        </h1>
+        <div class='flex'>
+          <h1 class='flex-grow fs-2 lh-4 padding-1'>
+            <label
+              for=${inputId}
+              id=${labelId}>
+              ${label}
+            </label>
+          </h1>
+          <div class='flex padding-1'>
+            <button
+              aria-label='Cancel'
+              class='button-icon'
+              onclick=${this.cancel.bind(this)}
+              type='button'>
+              <hw-icon name='x' />
+            </button>
+          </div>
+        </div>
         <div
-          aria-expanded=${hasOptions}
+          aria-expanded=${this._hasOptions}
           aria-haspopup='listbox'
           aria-owns=${listboxId}
           class='padding-1 pos-rel'
@@ -139,29 +166,42 @@ define('hw-lookup-popup', {
         <ul
           aria-labelledby=${labelId}
           class='list-plain padding-1'
-          .hidden=${!hasOptions}
+          .hidden=${!this._hasOptions}
           id=${listboxId}
           role='listbox'>
           ${this._options.map(renderOption.bind(this))}
         </ul>
         <div
           class='popup__empty lh-4'
-          .hidden=${hasOptions}>
+          .hidden=${this._hasOptions}>
           No results
         </div>
-      </div>
+      </form>
     `)
-    document.getElementById(inputId).focus()
+  },
+  setOptions (options) {
+    this._options = options
+    this._optionsCount = this._options.length
+    this._hasOptions = this._optionsCount > 0
+    this._selectedIndex = this._hasOptions ? 0 : -1
+    this.render()
+  },
+  getSelectedOption () {
+    const i = this._selectedIndex
+    return i > -1 ? this._options[i] : null
+  },
+  handleFormSubmit (event) {
+    event.preventDefault()
+    this.resolve()
   },
   handleInputChange (event) {
     const { value } = event.target
-    this._options = this._allOptions
+    const options = this._allOptions
       .filter(({ title }) =>
         title.toLowerCase().indexOf(value.trim().toLowerCase()) !== -1
       )
       .slice(0, MAX_RESULTS)
-    this._selectedIndex = 0
-    this.render()
+    this.setOptions(options)
   },
   handleInputKeyDown (event) {
     const { key } = event
@@ -176,20 +216,15 @@ define('hw-lookup-popup', {
         this._selectedIndex = i === 0 ? lastIndex : i - 1
         this.render()
         return
-      case 'Enter':
-        this._value = this._optionsCount ? this._options[i].path : null
-        this.close()
-        return
       case 'Escape':
         if (event.target.value.length === 0) {
-          this.close()
+          this.cancel()
           return
         }
     }
   },
   handleOptionClick () {
-    this._value = this._options[this._selectedIndex].path
-    this.close()
+    this.resolve()
   },
   handleOptionMouseOver (event) {
     this._selectedIndex = parseInt(event.target.dataset.index)
