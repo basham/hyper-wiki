@@ -1,6 +1,6 @@
 import cuid from 'https://cdn.pika.dev/cuid'
 import { css, define, html, render } from 'https://cdn.pika.dev/uce'
-import { MAX_RESULTS, PAGE_ICON, PAGE_TITLE } from '../constants.js'
+import { FOCUSABLE_ELEMENTS, MAX_RESULTS, PAGE_ICON, PAGE_TITLE } from '../constants.js'
 
 const cn = cuid()
 
@@ -21,6 +21,8 @@ define('hw-lookup-popup', {
       box-shadow:
         0 var(--px-1) 0 0 var(--color-black-2),
         0 var(--size-1) var(--size-2) 0 var(--color-shadow-1);
+      margin: 0 auto;
+      max-width: 40rem;
     }
 
     .${cn} .popup__icon {
@@ -53,9 +55,9 @@ define('hw-lookup-popup', {
     const id = cuid()
     this._ids = {
       id,
-      inputId: `${this._id}-input`,
-      labelId: `${this._id}-label`,
-      listboxId: `${this._id}-listbox`
+      inputId: `${id}-input`,
+      labelId: `${id}-label`,
+      listboxId: `${id}-listbox`
     }
   },
   async open () {
@@ -66,6 +68,8 @@ define('hw-lookup-popup', {
     this._activeElement = document.activeElement
     this._container = document.createElement('div')
     this._container.classList.add(cn)
+    this._container.setAttribute('aria-labelledby', this._ids.labelId)
+    this._container.setAttribute('role', 'dialog')
     this._container.addEventListener('click', this.cancelByContainer.bind(this))
     document.body.style.overflow = 'hidden'
     document.body.append(this._container)
@@ -130,6 +134,7 @@ define('hw-lookup-popup', {
     render(this._container, html`
       <form
         class='popup padding-1'
+        onkeydown=${this.handleTrapFocus.bind(this)}
         onsubmit=${this.handleFormSubmit.bind(this)}
         tabindex='-1'>
         <div class='flex'>
@@ -196,6 +201,27 @@ define('hw-lookup-popup', {
   getSelectedOption () {
     const i = this._selectedIndex
     return i > -1 ? this._options[i] : null
+  },
+  handleTrapFocus (event) {
+    if (event.key !== 'Tab') {
+      return
+    }
+
+    const focusableEls = this._container.querySelectorAll(FOCUSABLE_ELEMENTS)
+    const first = focusableEls[0]
+    const last = focusableEls[focusableEls.length - 1]
+
+    if (event.shiftKey) {
+      if (document.activeElement === first) {
+        last.focus()
+        event.preventDefault()
+      }
+    } else {
+      if (document.activeElement === last) {
+        first.focus()
+        event.preventDefault()
+      }
+    }
   },
   handleFormSubmit (event) {
     event.preventDefault()
