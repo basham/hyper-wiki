@@ -76,11 +76,18 @@ define('hw-root', {
               <dl>
                 <dt>Related pages</dt>
                 ${linkRefsHTML}
-                <dd>
+                <dd class='flex-gap-2'>
                   <button onclick=${handleAddLink} type='button'>
                     <hw-icon name='plus' />
                     Add link
                   </button>
+                  <button onclick=${handleLookup} data-popup='lookup' type='button'>
+                    <hw-icon name='plus' />
+                    Lookup
+                  </button>
+                  <hw-lookup-popup
+                    id='lookup'
+                    label='Add related page' />
                 </dd>
                 <dt>Subpages</dt>
                 ${subpagesHTML}
@@ -90,7 +97,7 @@ define('hw-root', {
                 <dd>🕓 ${dateFormat(mtime)}</dt>
               </dl>
               <div class='flex-gap-2 padding-t-4'>
-                <button class='' onclick=${handleMovePage} type='button'>
+                <button onclick=${handleMovePage} type='button'>
                   Move
                 </button>
                 <button .hidden=${isTrashed} onclick=${handleDeletePage} type='button'>
@@ -108,6 +115,11 @@ define('hw-root', {
     this.querySelector('.page__content').innerHTML = page
   }
 })
+
+function handleLookup (event) {
+  const { popup } = event.target.dataset
+  document.getElementById(popup).open()
+}
 
 async function getBreadcrumbs (path) {
   const stat = await beaker.hyperdrive.stat(path)
