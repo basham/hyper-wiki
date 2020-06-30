@@ -28,7 +28,7 @@ define('hw-root', {
       .map(({ path }) =>
         html`<dd>
           <a href='${path}' is='hw-link'></a>
-          (<button onclick=${handleRemoveLink} data-path='${path}' type='button'>Remove</button>)
+          (<button onclick=${handleRemoveRelatedPage} data-path='${path}' type='button'>Remove</button>)
         </dd>`
       )
 
@@ -77,13 +77,9 @@ define('hw-root', {
                 <dt>Related pages</dt>
                 ${linkRefsHTML}
                 <dd class='flex-gap-2'>
-                  <button onclick=${handleAddLink} type='button'>
+                  <button onclick=${handleAddRelatedPage} type='button'>
                     <hw-icon name='plus' />
-                    Add link
-                  </button>
-                  <button onclick=${handleLookup} data-popup='lookup' type='button'>
-                    <hw-icon name='plus' />
-                    Lookup
+                    Add related page
                   </button>
                 </dd>
                 <dt>Subpages</dt>
@@ -108,19 +104,11 @@ define('hw-root', {
           </div>
         </article>
       </main>
-      <hw-lookup-popup
-        id='lookup'
-        label='Add related page' />
+      <hw-lookup-popup id='lookup' />
     `
     this.querySelector('.page__content').innerHTML = page
   }
 })
-
-async function handleLookup (event) {
-  const { popup } = event.target.dataset
-  const v = await document.getElementById(popup).open()
-  console.log('$$', v)
-}
 
 async function getBreadcrumbs (path) {
   const stat = await beaker.hyperdrive.stat(path)
@@ -140,23 +128,14 @@ async function handleNewPage () {
 }
 
 async function handleMovePage () {
-  const info = await beaker.hyperdrive.getInfo(pathname)
-  const files = await beaker.shell.selectFileDialog({
-    title: 'Select Page',
-    buttonLabel: 'Select',
-    drive: info.url,
-    select: ['file'],
-    filters: {
-      extensions: ['md', 'html']
-    },
-    allowMultiple: false,
-    disallowCreate: true
-  })
-  const { path } = files[0]
-  await beaker.hyperdrive.updateMetadata(pathname, {
-    parent: path
-  })
-  window.location.reload()
+  try {
+    const lookup = document.getElementById('lookup')
+    const parent = await lookup.open({
+      label: 'Move to page'
+    })
+    await beaker.hyperdrive.updateMetadata(pathname, { parent })
+    window.location.reload()
+  } catch (error) {}
 }
 
 async function handleDeletePage () {
@@ -173,32 +152,19 @@ async function handleRestorePage () {
   window.location = fileUrl
 }
 
-async function handleAddLink () {
-  const info = await beaker.hyperdrive.getInfo(pathname)
-  const files = await beaker.shell.selectFileDialog({
-    title: 'Select Page',
-    buttonLabel: 'Select',
-    drive: info.url,
-    select: ['file'],
-    filters: {
-      extensions: ['md', 'html'],
-      writable: true
-    },
-    allowMultiple: true,
-    disallowCreate: true
-  })
-
-  const filePaths = files.map(({ path }) => path)
-  await mergeLinks(pathname, filePaths)
-
-  for (const file of files) {
-    await mergeLinks(file.url, [pathname])
-  }
-
-  window.location.reload()
+async function handleAddRelatedPage (event) {
+  try {
+    const lookup = document.getElementById('lookup')
+    const value = await lookup.open({
+      label: 'Add related page'
+    })
+    await mergeLinks(pathname, [value])
+    await mergeLinks(value, [pathname])
+    window.location.reload()
+  } catch (error) {}
 }
 
-async function handleRemoveLink (event) {
+async function handleRemoveRelatedPage (event) {
   const { path } = event.target.dataset
   await removeLink(pathname, path)
   await removeLink(path, pathname)

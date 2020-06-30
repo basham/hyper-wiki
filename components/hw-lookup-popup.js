@@ -1,12 +1,10 @@
 import cuid from 'https://cdn.pika.dev/cuid'
-import { css, define, html, render } from 'https://cdn.pika.dev/uce'
+import { css, define, html } from 'https://cdn.pika.dev/uce'
 import { FOCUSABLE_ELEMENTS, MAX_RESULTS, PAGE_ICON, PAGE_TITLE } from '../constants.js'
 
-const cn = cuid()
-
 define('hw-lookup-popup', {
-  style: () => css`
-    .${cn} {
+  style: (selector) => css`
+    ${selector} .popup {
       height: 100vh;
       left: 0;
       overflow: auto;
@@ -16,7 +14,7 @@ define('hw-lookup-popup', {
       z-index: 1;
     }
 
-    .${cn} .popup {
+    ${selector} .popup__form {
       background-color: var(--color-white);
       box-shadow:
         0 var(--px-1) 0 0 var(--color-black-2),
@@ -25,28 +23,28 @@ define('hw-lookup-popup', {
       max-width: 40rem;
     }
 
-    .${cn} .popup__icon {
+    ${selector} .popup__icon {
       left: var(--size-1);
       position: absolute;
       top: var(--size-1);
     }
 
-    .${cn} .popup__option {
+    ${selector} .popup__option {
       line-height: var(--px-20);
       padding: var(--px-6) var(--size-2);
     }
 
-    .${cn} .popup__option[aria-selected="true"] {
+    ${selector} .popup__option[aria-selected="true"] {
       background-color: var(--color-blue-6);
       color: var(--color-white);
       cursor: pointer;
     }
 
-    .${cn} .popup__option[aria-selected="true"] .popup__option-small {
+    ${selector} .popup__option[aria-selected="true"] .popup__option-small {
       color: var(--color-white);
     }
 
-    .${cn} .popup__empty {
+    ${selector} .popup__empty {
       padding: var(--size-1) var(--size-1) var(--size-1) var(--size-6);
     }
   `,
@@ -55,24 +53,21 @@ define('hw-lookup-popup', {
     const id = cuid()
     this._ids = {
       id,
+      backdropId: `${id}-backdrop`,
       inputId: `${id}-input`,
       labelId: `${id}-label`,
       listboxId: `${id}-listbox`
     }
   },
-  async open () {
+  async open (options) {
     if (this.isOpen) {
       return
     }
+    const { label = '' } = options
+    this._label = label
     this._isOpen = true
     this._activeElement = document.activeElement
-    this._container = document.createElement('div')
-    this._container.classList.add(cn)
-    this._container.setAttribute('aria-labelledby', this._ids.labelId)
-    this._container.setAttribute('role', 'dialog')
-    this._container.addEventListener('click', this.cancelByContainer.bind(this))
     document.body.style.overflow = 'hidden'
-    document.body.append(this._container)
     const pages = await beaker.hyperdrive.query({
       path: '*/*.md',
       reverse: true,
@@ -113,7 +108,8 @@ define('hw-lookup-popup', {
     this._reject('No value selected')
   },
   cancelByContainer (event) {
-    if (event.target === this._container) {
+    const backdrop = document.getElementById(this._ids.backdropId)
+    if (event.target === backdrop) {
       this.cancel()
     }
   },
@@ -122,74 +118,81 @@ define('hw-lookup-popup', {
       return
     }
     this._isOpen = false
-    this._container.remove()
+    this.html`${null}`
     document.body.style.overflow = ''
     this._activeElement.focus()
   },
   render () {
-    const { label } = this.props
-    const { inputId, labelId, listboxId } = this._ids
+    const { _ids, _label } = this
+    const { backdropId, inputId, labelId, listboxId } = _ids
     const selectedOption = this.getSelectedOption()
     const selectedId = selectedOption ? selectedOption.id : null
-    render(this._container, html`
-      <form
-        class='popup padding-1'
-        onkeydown=${this.handleTrapFocus.bind(this)}
-        onsubmit=${this.handleFormSubmit.bind(this)}
-        tabindex='-1'>
-        <div class='flex'>
-          <h1 class='flex-grow fs-2 lh-4 padding-1'>
-            <label
-              for=${inputId}
-              id=${labelId}>
-              ${label}
-            </label>
-          </h1>
-          <div class='flex padding-1'>
-            <button
-              aria-label='Cancel'
-              class='button-icon'
-              onclick=${this.cancel.bind(this)}
-              type='button'>
-              <hw-icon name='x' />
-            </button>
+    this.html`
+      <div
+        aria-labelledby=${labelId}
+        class='popup'
+        id=${backdropId}
+        onclick=${this.cancelByContainer.bind(this)}
+        role='dialog'>
+        <form
+          class='popup__form padding-1'
+          onkeydown=${this.handleTrapFocus.bind(this)}
+          onsubmit=${this.handleFormSubmit.bind(this)}
+          tabindex='-1'>
+          <div class='flex'>
+            <h1 class='flex-grow fs-2 lh-4 padding-1'>
+              <label
+                for=${inputId}
+                id=${labelId}>
+                ${_label}
+              </label>
+            </h1>
+            <div class='flex padding-1'>
+              <button
+                aria-label='Cancel'
+                class='button-icon'
+                onclick=${this.cancel.bind(this)}
+                type='button'>
+                <hw-icon name='x' />
+              </button>
+            </div>
           </div>
-        </div>
-        <div
-          aria-expanded=${this._hasOptions}
-          aria-haspopup='listbox'
-          aria-owns=${listboxId}
-          class='padding-1 pos-rel'
-          role='combobox'>
-          <hw-icon
-            class='popup__icon color-text-light padding-1'
-            name='search' />
-          <input
-            aria-activedescendant=${selectedId}
-            aria-autocomplete='list'
-            aria-controls=${listboxId}
-            class='padding-l-5'
-            id=${inputId}
-            placeholder='Search for a page…'
-            oninput=${this.handleInputChange.bind(this)}
-            onkeydown=${this.handleInputKeyDown.bind(this)}
-            type='search' />
-        </div>
-        <ul
-          aria-labelledby=${labelId}
-          class='list-plain padding-1'
-          .hidden=${!this._hasOptions}
-          id=${listboxId}
-          role='listbox'>
-          ${this._options.map(renderOption.bind(this))}
-        </ul>
-        <div
-          class='popup__empty lh-4'
-          .hidden=${this._hasOptions}>
-          No results
-        </div>
-      </form>
-    `)
+          <div
+            aria-expanded=${this._hasOptions}
+            aria-haspopup='listbox'
+            aria-owns=${listboxId}
+            class='padding-1 pos-rel'
+            role='combobox'>
+            <hw-icon
+              class='popup__icon color-text-light padding-1'
+              name='search' />
+            <input
+              aria-activedescendant=${selectedId}
+              aria-autocomplete='list'
+              aria-controls=${listboxId}
+              class='padding-l-5'
+              id=${inputId}
+              placeholder='Search for a page…'
+              oninput=${this.handleInputChange.bind(this)}
+              onkeydown=${this.handleInputKeyDown.bind(this)}
+              type='search' />
+          </div>
+          <ul
+            aria-labelledby=${labelId}
+            class='list-plain padding-1'
+            .hidden=${!this._hasOptions}
+            id=${listboxId}
+            role='listbox'>
+            ${this._options.map(renderOption.bind(this))}
+          </ul>
+          <div
+            class='popup__empty lh-4'
+            .hidden=${this._hasOptions}>
+            No results
+          </div>
+        </form>
+      </div>
+    `
   },
   setOptions (options) {
     this._options = options
@@ -207,7 +210,7 @@ define('hw-lookup-popup', {
       return
     }
 
-    const focusableEls = this._container.querySelectorAll(FOCUSABLE_ELEMENTS)
+    const focusableEls = this.querySelectorAll(FOCUSABLE_ELEMENTS)
     const first = focusableEls[0]
     const last = focusableEls[focusableEls.length - 1]
 
