@@ -71,6 +71,7 @@ define('hw-root', {
           <h1 class='padding-t-2'>${title}</h1>
           <div class='page__body flex-wrap padding-t-4'>
             <article class='page__content flex-grow padding-4'>
+              ${html(page)}
             </article>
             <footer class='page__info padding-4'>
               <dl>
@@ -106,7 +107,6 @@ define('hw-root', {
       </main>
       <hw-lookup-popup id='lookup' />
     `
-    this.querySelector('.page__content').innerHTML = page
   }
 })
 
