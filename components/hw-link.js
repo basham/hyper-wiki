@@ -1,5 +1,6 @@
 import { css, define } from 'https://cdn.pika.dev/uce'
 import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
+import { getPagePath } from '../util.js'
 
 define('hw-link', {
   extends: 'a',
@@ -13,8 +14,18 @@ define('hw-link', {
     }
   `,
   async init () {
-    const { metadata } = await beaker.hyperdrive.stat(this.href)
-    const { icon = PAGE_ICON, title = PAGE_TITLE } = metadata
+    const { entity } = this.dataset
+    if (!entity) {
+      const info = await beaker.hyperdrive.getInfo()
+      this.href = '/'
+      this.html`<span class='title'>${info.title}</span>`
+      return
+    }
+    const path = getPagePath(entity)
+    const { metadata } = await beaker.hyperdrive.stat(path)
+    const icon = metadata.icon || PAGE_ICON
+    const title = metadata.title || PAGE_TITLE
+    this.href = `/${entity}/`
     this.html`${icon} <span class='title'>${title}</span>`
   }
 })
