@@ -126,10 +126,10 @@ async function renderEntity () {
         <div class='padding-t-2'>
           <h1
             contenteditable=${isTrashed ? 'false' : 'true'}
+            .innerText=${title}
             onblur=${handleEditPageTitleBlur}
             onkeydown=${handleEditPageTitleKeydown}
             placeholder=${PAGE_TITLE}>
-            ${title}
           </h1>
         </div>
         <footer class='padding-t-4'>
