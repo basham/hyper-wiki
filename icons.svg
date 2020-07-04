@@ -1,13 +1,25 @@
 <!-- https://github.com/feathericons/feather -->
 <svg xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <symbol id="corner-up-right" viewBox="0 0 24 24">
+      <polyline points="15 14 20 9 15 4" />
+      <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
+    </symbol>
     <symbol id="plus" viewBox="0 0 24 24">
       <line x1="12" y1="5" x2="12" y2="19"></line>
       <line x1="5" y1="12" x2="19" y2="12"></line>
     </symbol>
+    <symbol id="rotate-ccw" viewBox="0 0 24 24">
+      <polyline points="1 4 1 10 7 10" />
+      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+    </symbol>
     <symbol id="search" viewBox="0 0 24 24">
       <circle cx="11" cy="11" r="8" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </symbol>
+    <symbol id="trash" viewBox="0 0 24 24">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </symbol>
     <symbol id="x" viewBox="0 0 24 24">
       <line x1="18" y1="6" x2="6" y2="18" />

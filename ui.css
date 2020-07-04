@@ -139,7 +139,7 @@ button:focus {
 }
 
 button > hw-icon {
-  padding-right: var(--size-0);
+  padding-right: var(--size-1);
 }
 
 .button-icon {
@@ -214,6 +214,10 @@ input[type="text"]:focus {
 
 /* Utils */
 
+.bg-black-0 {
+  background-color: var(--color-black-0);
+}
+
 .border {
   border: var(--px-1) solid var(--color-black-1);
 }
@@ -235,8 +239,15 @@ input[type="text"]:focus {
 }
 
 .flex-center {
-  align-items: center;
-  display: flex;
+  justify-content: center;
+}
+
+.flex-gap-1 {
+  margin: calc(var(--size-0) * -1);
+}
+
+.flex-gap-1 > * {
+  margin: var(--size-0);
 }
 
 .flex-gap-2 {
@@ -253,6 +264,10 @@ input[type="text"]:focus {
 
 .flex-inline {
   display: inline-flex;
+}
+
+.flex-middle {
+  align-items: center;
 }
 
 .flex-wrap {

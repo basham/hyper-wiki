@@ -10,12 +10,12 @@ define('hw-icon', {
 
     ${selector} svg {
       fill: none;
-      height: var(--size-3);
+      height: var(--size-2);
       stroke: currentColor;
       stroke-linecap: round;
       stroke-linejoin: round;
       stroke-width: calc(2rem/16);
-      width: var(--size-3);
+      width: var(--size-2);
     }
   `,
   init () {

@@ -13,7 +13,6 @@ export async function deleteEntity (entity = getEntityId()) {
     version: VERSION
   }
   await beaker.hyperdrive.writeFile(path, '', { metadata })
-  window.location.reload()
 }
 
 export function getTrashFilePath (entity) {
@@ -28,5 +27,4 @@ export async function isEntityTrashed (entity) {
 export async function restoreEntity (entity) {
   const path = getTrashFilePath(entity)
   await beaker.hyperdrive.unlink(path)
-  window.location.reload()
 }

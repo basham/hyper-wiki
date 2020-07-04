@@ -65,9 +65,11 @@ async function renderFile () {
 async function renderEntity () {
   const info = await beaker.hyperdrive.getInfo()
   const { ctime, mtime, metadata } = await beaker.hyperdrive.stat(getPageFilePath())
+  const { title } = metadata
   const icon = metadata.icon || PAGE_ICON
-  const title = metadata.title || PAGE_TITLE
-  document.title = [title, info.title].filter((v) => v).join(' - ')
+  document.title = [(title || PAGE_TITLE), info.title]
+    .filter((v) => v)
+    .join(' - ')
   document.getElementById('favicon').href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icon}</text></svg>`
 
   const isTrashed = await isEntityTrashed()
@@ -111,7 +113,8 @@ async function renderEntity () {
       <li aria-current='page'>
         <a data-entity=${getEntityId()} is='hw-link'></a>
       </li>
-    `
+    `,
+    isTrashed
   })
   const content = await parseFile(getPageFilePath())
 
@@ -122,7 +125,7 @@ async function renderEntity () {
         <div class='page__icon'>${icon}</div>
         <div class='padding-t-2'>
           <h1
-            contenteditable='true'
+            contenteditable=${isTrashed ? 'false' : 'true'}
             onblur=${handleEditPageTitleBlur}
             onkeydown=${handleEditPageTitleKeydown}
             placeholder=${PAGE_TITLE}>
@@ -148,25 +151,6 @@ async function renderEntity () {
             <dt>Updated</dt>
             <dd>🕓 ${dateFormat(mtime)}</dt>
           </dl>
-          <div class='flex-gap-2 padding-t-4'>
-            <button
-              onclick=${handleMovePage}
-              type='button'>
-              Move
-            </button>
-            <button
-              .hidden=${isTrashed}
-              onclick=${handleDeletePage}
-              type='button'>
-              Delete
-            </button>
-            <button
-              .hidden=${!isTrashed}
-              onclick=${handleRestorePage}
-              type='button'>
-              Restore
-            </button>
-          </div>
         </footer>
         <article class='padding-t-4'>
           ${html([content])}
@@ -178,28 +162,53 @@ async function renderEntity () {
 }
 
 function renderHeader (props = {}) {
-  const { breadcrumbs = html`` } = props
+  const { breadcrumbs = html``, isTrashed } = props
   return html`
-    <header class='flex-center flex-wrap border-bottom padding-1'>
+    <header class='flex flex-middle flex-wrap border-bottom padding-1'>
       <nav
         aria-label='Breadcrumbs'
         class='flex-grow'>
-        <ol class='list-plain list-pagination flex-center flex-wrap lh-4 padding-1'>
+        <ol class='list-plain list-pagination flex-middle flex-wrap lh-4 padding-1'>
           <li>
             <a is='hw-link'></a>
           </li>
           ${breadcrumbs}
         </ol>
       </nav>
-      <div class='flex-center flex-wrap padding-1'>
-        <button
-          onclick=${handleNewPage}
-          type='button'>
+      <div class='flex flex-gap-1 flex-middle flex-wrap padding-1'>
+        <button onclick=${handleNewPage}>
           <hw-icon name='plus' />
-          New page
+          New
+        </button>
+        <button
+          .hidden=${isTrashed}
+          onclick=${handleMovePage}>
+          <hw-icon name='corner-up-right' />
+          Move
+        </button>
+        <button
+          .hidden=${isTrashed}
+          onclick=${handleDeletePage}>
+          <hw-icon name='trash' />
+          Delete
         </button>
       </div>
     </header>
+    <div
+      class='bg-black-0 border-bottom padding-2'
+      .hidden=${!isTrashed}>
+      <div class='flex flex-center flex-gap-2 flex-middle flex-wrap'>
+        <div>Page is trashed.</div>
+        <button onclick=${handleRestorePage}>
+          <hw-icon name='rotate-ccw' />
+          Restore
+        </button>
+        <button>
+          <hw-icon name='trash' />
+          Delete permanently
+        </button>
+      </div>
+    </div>
   `
 }
 
@@ -224,24 +233,23 @@ async function handleMovePage () {
       label: 'Move to page'
     })
     await beaker.hyperdrive.updateMetadata(pathname, { parent })
-    window.location.reload()
+    dispatch('render')
   } catch (error) {}
 }
 
 async function handleDeletePage () {
   await deleteEntity()
-  window.location.reload()
+  dispatch('render')
 }
 
 async function handleRestorePage () {
   await restoreEntity()
-  window.location.reload()
+  dispatch('render')
 }
 
 async function handleEditPageTitle (event) {
   await updatePageTitle({ title: event.target.innerText })
-  const renderEvent = new CustomEvent('render', { bubbles: true })
-  event.target.dispatchEvent(renderEvent)
+  dispatch('render')
 }
 
 async function handleEditPageTitleBlur (event) {
@@ -263,7 +271,7 @@ async function handleAddRelatedPage (event) {
     })
     await mergeLinks(pathname, [value])
     await mergeLinks(value, [pathname])
-    window.location.reload()
+    dispatch('render')
   } catch (error) {}
 }
 
@@ -271,7 +279,7 @@ async function handleRemoveRelatedPage (event) {
   const { path } = event.target.dataset
   await removeLink(pathname, path)
   await removeLink(path, pathname)
-  window.location.reload()
+  dispatch('render')
 }
 
 async function mergeLinks (fromPath, toPaths) {
@@ -313,4 +321,8 @@ async function parseFile (path) {
 
 function dateFormat (source) {
   return (new Date(source)).toLocaleString()
+}
+
+function dispatch (eventName) {
+  document.dispatchEvent(new CustomEvent(eventName))
 }
