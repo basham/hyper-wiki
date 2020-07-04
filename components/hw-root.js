@@ -1,14 +1,11 @@
-import cuid from 'https://cdn.pika.dev/cuid'
 import { define, html } from 'https://cdn.pika.dev/uce'
-import { DATA_FOLDER, PAGE_ICON, PAGE_TITLE, TRASH_FOLDER } from '../constants.js'
-import { getEntityId, getPagePath } from '../util.js'
-
-//const entity = getEntityId()
+import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
+import { getEntityId } from '../util/entity.js'
+import { deleteEntity, isEntityTrashed, restoreEntity } from '../util/trash.js'
+import { getPageFilePath, createPage } from '../util/page.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
-
-const isTrashed = pathname.startsWith(TRASH_FOLDER, 1)
 
 define('hw-root', {
   async init () {
@@ -63,12 +60,13 @@ async function renderFile () {
 
 async function renderEntity () {
   const info = await beaker.hyperdrive.getInfo()
-  const { ctime, mtime, metadata } = await beaker.hyperdrive.stat(getPagePath())
+  const { ctime, mtime, metadata } = await beaker.hyperdrive.stat(getPageFilePath())
   const icon = metadata.icon || PAGE_ICON
   const title = metadata.title || PAGE_TITLE
   document.title = [title, info.title].filter((v) => v).join(' - ')
   document.getElementById('favicon').href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icon}</text></svg>`
 
+  const isTrashed = await isEntityTrashed()
   /*
   const breadcrumbs = await getBreadcrumbs(pathname)
   const breadcrumbsHTML = breadcrumbs.map((path) =>
@@ -111,7 +109,7 @@ async function renderEntity () {
       </li>
     `
   })
-  const content = await parseFile(getPagePath())
+  const content = await parseFile(getPageFilePath())
 
   return html`
     ${header}
@@ -128,7 +126,9 @@ async function renderEntity () {
               <dt>Related pages</dt>
               ${linkRefsHTML}
               <dd class='flex-gap-2'>
-                <button onclick=${handleAddRelatedPage} type='button'>
+                <button
+                  onclick=${handleAddRelatedPage}
+                  type='button'>
                   <hw-icon name='plus' />
                   Add related page
                 </button>
@@ -141,13 +141,21 @@ async function renderEntity () {
               <dd>🕓 ${dateFormat(mtime)}</dt>
             </dl>
             <div class='flex-gap-2 padding-t-4'>
-              <button onclick=${handleMovePage} type='button'>
+              <button
+                onclick=${handleMovePage}
+                type='button'>
                 Move
               </button>
-              <button .hidden=${isTrashed} onclick=${handleDeletePage} type='button'>
+              <button
+                .hidden=${isTrashed}
+                onclick=${handleDeletePage}
+                type='button'>
                 Delete
               </button>
-              <button .hidden=${!isTrashed} onclick=${handleRestorePage} type='button'>
+              <button
+                .hidden=${!isTrashed}
+                onclick=${handleRestorePage}
+                type='button'>
                 Restore
               </button>
             </div>
@@ -163,7 +171,9 @@ function renderHeader (props = {}) {
   const { breadcrumbs = html`` } = props
   return html`
     <header class='flex-center flex-wrap border-bottom padding-1'>
-      <nav aria-label='Breadcrumbs' class='flex-grow'>
+      <nav
+        aria-label='Breadcrumbs'
+        class='flex-grow'>
         <ol class='list-plain list-pagination flex-center flex-wrap lh-4 padding-1'>
           <li>
             <a is='hw-link'></a>
@@ -172,7 +182,9 @@ function renderHeader (props = {}) {
         </ol>
       </nav>
       <div class='flex-center flex-wrap padding-1'>
-        <button onclick=${handleNewPage} type='button'>
+        <button
+          onclick=${handleNewPage}
+          type='button'>
           <hw-icon name='plus' />
           New page
         </button>
@@ -192,17 +204,7 @@ async function getBreadcrumbs (path) {
 }
 
 async function handleNewPage () {
-  const entity = cuid()
-  const path = getPagePath(entity)
-  const metadata = {
-    entity,
-    type: 'page',
-    version: 1,
-    icon: '',
-    title: ''
-  }
-  await beaker.hyperdrive.writeFile(path, '', { metadata })
-  window.location = `/${entity}`
+  window.location = await createPage()
 }
 
 async function handleMovePage () {
@@ -217,17 +219,13 @@ async function handleMovePage () {
 }
 
 async function handleDeletePage () {
-  const fileName = pathname.split('/').reverse()[0]
-  const fileUrl = `/${TRASH_FOLDER}/${fileName}`
-  await beaker.hyperdrive.rename(pathname, fileUrl)
-  window.location = fileUrl
+  await deleteEntity()
+  window.location.reload()
 }
 
 async function handleRestorePage () {
-  const fileName = pathname.split('/').reverse()[0]
-  const fileUrl = `${DATA_FOLDER}/${fileName}`
-  await beaker.hyperdrive.rename(pathname, fileUrl)
-  window.location = fileUrl
+  await restoreEntity()
+  window.location.reload()
 }
 
 async function handleAddRelatedPage (event) {

@@ -1,5 +1,3 @@
-export const DATA_FOLDER = '/data'
-
 export const FOCUSABLE_ELEMENTS = [
   'a[href]',
   'button',
@@ -14,5 +12,3 @@ export const MAX_RESULTS = 10
 
 export const PAGE_ICON = '📄'
 export const PAGE_TITLE = 'Untitled'
-
-export const TRASH_FOLDER = 'trash'
