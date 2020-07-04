@@ -49,12 +49,21 @@
   outline-offset: var(--px-2);
 }
 
-[tabindex="-1"]:focus {
+[contenteditable="true"]:empty::before {
+  color: var(--color-black-2);
+  content: attr(placeholder);
+}
+
+[contenteditable="true"]:focus {
   outline: none;
 }
 
 [hidden] {
   display: none;
+}
+
+[tabindex="-1"]:focus {
+  outline: none;
 }
 
 body {
@@ -192,7 +201,7 @@ input[type="text"]:focus {
 }
 
 .page__body {
-  margin: calc(var(--size-4) * -1);
+  /*margin: calc(var(--size-4) * -1);*/
 }
 
 .page__content {

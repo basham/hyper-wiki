@@ -2,13 +2,17 @@ import { define, html } from 'https://cdn.pika.dev/uce'
 import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 import { getEntityId } from '../util/entity.js'
 import { deleteEntity, isEntityTrashed, restoreEntity } from '../util/trash.js'
-import { getPageFilePath, createPage } from '../util/page.js'
+import { createPage, getPageFilePath, updatePageTitle } from '../util/page.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
 
 define('hw-root', {
   async init () {
+    this.render()
+    document.addEventListener('render', this.render.bind(this))
+  },
+  async render () {
     const content = await render()
     this.html`${content}`
   }
@@ -116,51 +120,57 @@ async function renderEntity () {
     <main>
       <article class='page padding-8'>
         <div class='page__icon'>${icon}</div>
-        <h1 class='padding-t-2'>${title}</h1>
-        <div class='page__body flex-wrap padding-t-4'>
-          <article class='page__content flex-grow padding-4'>
-            ${html([content])}
-          </article>
-          <footer class='page__info padding-4'>
-            <dl>
-              <dt>Related pages</dt>
-              ${linkRefsHTML}
-              <dd class='flex-gap-2'>
-                <button
-                  onclick=${handleAddRelatedPage}
-                  type='button'>
-                  <hw-icon name='plus' />
-                  Add related page
-                </button>
-              </dd>
-              <dt>Subpages</dt>
-              ${subpagesHTML}
-              <dt>Created</dt>
-              <dd>🕓 ${dateFormat(ctime)}</dt>
-              <dt>Updated</dt>
-              <dd>🕓 ${dateFormat(mtime)}</dt>
-            </dl>
-            <div class='flex-gap-2 padding-t-4'>
-              <button
-                onclick=${handleMovePage}
-                type='button'>
-                Move
-              </button>
-              <button
-                .hidden=${isTrashed}
-                onclick=${handleDeletePage}
-                type='button'>
-                Delete
-              </button>
-              <button
-                .hidden=${!isTrashed}
-                onclick=${handleRestorePage}
-                type='button'>
-                Restore
-              </button>
-            </div>
-          </footer>
+        <div class='padding-t-2'>
+          <h1
+            contenteditable='true'
+            onblur=${handleEditPageTitleBlur}
+            onkeydown=${handleEditPageTitleKeydown}
+            placeholder=${PAGE_TITLE}>
+            ${title}
+          </h1>
         </div>
+        <footer class='padding-t-4'>
+          <dl>
+            <dt>Related pages</dt>
+            ${linkRefsHTML}
+            <dd class='flex-gap-2'>
+              <button
+                onclick=${handleAddRelatedPage}
+                type='button'>
+                <hw-icon name='plus' />
+                Add related page
+              </button>
+            </dd>
+            <dt>Subpages</dt>
+            ${subpagesHTML}
+            <dt>Created</dt>
+            <dd>🕓 ${dateFormat(ctime)}</dt>
+            <dt>Updated</dt>
+            <dd>🕓 ${dateFormat(mtime)}</dt>
+          </dl>
+          <div class='flex-gap-2 padding-t-4'>
+            <button
+              onclick=${handleMovePage}
+              type='button'>
+              Move
+            </button>
+            <button
+              .hidden=${isTrashed}
+              onclick=${handleDeletePage}
+              type='button'>
+              Delete
+            </button>
+            <button
+              .hidden=${!isTrashed}
+              onclick=${handleRestorePage}
+              type='button'>
+              Restore
+            </button>
+          </div>
+        </footer>
+        <article class='padding-t-4'>
+          ${html([content])}
+        </article>
       </article>
     </main>
     <hw-lookup-popup id='lookup' />
@@ -226,6 +236,23 @@ async function handleDeletePage () {
 async function handleRestorePage () {
   await restoreEntity()
   window.location.reload()
+}
+
+async function handleEditPageTitle (event) {
+  await updatePageTitle({ title: event.target.innerText })
+  const renderEvent = new CustomEvent('render', { bubbles: true })
+  event.target.dispatchEvent(renderEvent)
+}
+
+async function handleEditPageTitleBlur (event) {
+  await handleEditPageTitle(event)
+}
+
+async function handleEditPageTitleKeydown (event) {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    await handleEditPageTitle(event)
+  }
 }
 
 async function handleAddRelatedPage (event) {

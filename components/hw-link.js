@@ -15,6 +15,10 @@ define('hw-link', {
     }
   `,
   async init () {
+    this.render()
+    document.addEventListener('render', this.render.bind(this))
+  },
+  async render () {
     const { entity } = this.dataset
     if (!entity) {
       const info = await beaker.hyperdrive.getInfo()

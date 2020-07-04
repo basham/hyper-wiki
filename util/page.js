@@ -22,3 +22,9 @@ export async function createPage () {
 export function getPageFilePath (entity) {
   return `${getDataPath(entity)}${FILE_NAME}`
 }
+
+export async function updatePageTitle (options = {}) {
+  const { entity, title } = options
+  const path = getPageFilePath(entity)
+  await beaker.hyperdrive.updateMetadata(path, { title })
+}
