@@ -1,5 +1,5 @@
 import cuid from 'https://cdn.pika.dev/cuid'
-import { getDataPath, getEntityPath } from './entity.js'
+import { DATA_FOLDER, getDataPath, getEntityPath } from './entity.js'
 
 const FILE_NAME = 'page.md'
 const TYPE = 'page'
@@ -21,6 +21,16 @@ export async function createPage () {
 
 export function getPageFilePath (entity) {
   return `${getDataPath(entity)}${FILE_NAME}`
+}
+
+export async function getPages (query = {}) {
+  return await beaker.hyperdrive.query({
+    path: `${DATA_FOLDER}/*/${FILE_NAME}`,
+    reverse: true,
+    sort: 'ctime',
+    type: 'file',
+    ...query
+  })
 }
 
 export async function updatePageTitle (options = {}) {

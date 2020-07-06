@@ -3,7 +3,7 @@ import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 import { dateFormat } from '../util/date.js'
 import { getEntityId } from '../util/entity.js'
 import { deleteEntity, getTrashTime, isEntityTrashed, restoreEntity } from '../util/trash.js'
-import { createPage, getPageFilePath, updatePageTitle } from '../util/page.js'
+import { createPage, getPageFilePath, getPages, updatePageTitle } from '../util/page.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
@@ -20,6 +20,9 @@ define('hw-root', {
 })
 
 async function render () {
+  if (location.pathname === '/') {
+    return await renderIndex()
+  }
   try {
     return await renderFile()
   } catch (e) {
@@ -35,15 +38,36 @@ async function render () {
 function render404 () {
   return html`
     ${renderHeader()}
-    <main>
-      <article class='page padding-8'>
-        <div class='page__body flex-wrap padding-t-4'>
-          <article class='page__content flex-grow padding-4'>
-            <h1>File not found</h1>
-          </article>
-        </div>
-      </article>
+    <main class='page padding-8'>
+      <h1>File not found</h1>
     </main>
+  `
+}
+
+async function renderIndex () {
+  const info = await beaker.hyperdrive.getInfo()
+  const pages = (await getPages())
+    .map(({ stat }) => stat.metadata.entity)
+  return html`
+    ${renderHeader()}
+    <main class='page padding-8'>
+      <h1>${info.title}</h1>
+      <div class='padding-t-4'>
+        <ul class='list-plain'>
+          ${pages.map(renderPageLinkItem)}
+        </ul>
+      </div>
+    </main>
+  `
+}
+
+function renderPageLinkItem (entity) {
+  return html`
+    <li>
+      <a
+        data-entity=${entity}
+        is='hw-link'></a>
+    </li>
   `
 }
 
@@ -51,14 +75,12 @@ async function renderFile () {
   const content = await parseFile(location.pathname)
   return html`
     ${renderHeader()}
-    <main>
-      <article class='page padding-8'>
-        <div class='page__body flex-wrap padding-t-4'>
-          <article class='page__content flex-grow padding-4'>
-          ${html([content])}
-          </article>
-        </div>
-      </article>
+    <main class='page padding-8'>
+      <div class='padding-t-4'>
+        <article class='padding-4'>
+        ${html([content])}
+        </article>
+      </div>
     </main>
   `
 }
@@ -117,49 +139,48 @@ async function renderEntity () {
         <a data-entity=${getEntityId()} is='hw-link'></a>
       </li>
     `,
+    isEntity: true,
     isTrashed
   })
   const content = await parseFile(getPageFilePath())
 
   return html`
     ${header}
-    <main>
-      <article class='page padding-8'>
-        <div class='page__icon'>${icon}</div>
-        <div class='padding-t-2'>
-          <h1
-            contenteditable=${isTrashed ? 'false' : 'true'}
-            .innerText=${title}
-            onblur=${handleEditPageTitleBlur}
-            onkeydown=${handleEditPageTitleKeydown}
-            placeholder=${PAGE_TITLE}>
-          </h1>
-        </div>
-        <footer class='padding-t-4'>
-          <dl>
-            <dt>Related pages</dt>
-            ${linkRefsHTML}
-            <dd class='flex-gap-2'>
-              <button
-                onclick=${handleAddRelatedPage}
-                type='button'>
-                <hw-icon name='plus' />
-                Add related page
-              </button>
-            </dd>
-            <dt>Subpages</dt>
-            ${subpagesHTML}
-            <dt>Created</dt>
-            <dd>🕓 ${dateFormat(ctime)}</dt>
-            <dt>Updated</dt>
-            <dd>🕓 ${dateFormat(mtime)}</dt>
-            <dt .hidden=${!isTrashed}>Deleted</dt>
-            <dd .hidden=${!isTrashed}>🕓 ${dateFormat(trashTime)}</dt>
-          </dl>
-        </footer>
-        <article class='padding-t-4'>
-          ${html([content])}
-        </article>
+    <main class='page padding-8'>
+      <div class='page__icon'>${icon}</div>
+      <div class='padding-t-2'>
+        <h1
+          contenteditable=${isTrashed ? 'false' : 'true'}
+          .innerText=${title}
+          onblur=${handleEditPageTitleBlur}
+          onkeydown=${handleEditPageTitleKeydown}
+          placeholder=${PAGE_TITLE}>
+        </h1>
+      </div>
+      <div class='padding-t-4'>
+        <dl>
+          <dt>Related pages</dt>
+          ${linkRefsHTML}
+          <dd class='flex-gap-2'>
+            <button
+              onclick=${handleAddRelatedPage}
+              type='button'>
+              <hw-icon name='plus' />
+              Add related page
+            </button>
+          </dd>
+          <dt>Subpages</dt>
+          ${subpagesHTML}
+          <dt>Created</dt>
+          <dd>🕓 ${dateFormat(ctime)}</dt>
+          <dt>Updated</dt>
+          <dd>🕓 ${dateFormat(mtime)}</dt>
+          <dt .hidden=${!isTrashed}>Deleted</dt>
+          <dd .hidden=${!isTrashed}>🕓 ${dateFormat(trashTime)}</dt>
+        </dl>
+      </div>
+      <article class='padding-t-4'>
+        ${html([content])}
       </article>
     </main>
     <hw-lookup-popup id='lookup' />
@@ -167,7 +188,7 @@ async function renderEntity () {
 }
 
 function renderHeader (props = {}) {
-  const { breadcrumbs = html``, isTrashed } = props
+  const { breadcrumbs = html``, isEntity = false, isTrashed } = props
   return html`
     <header class='flex flex-middle flex-wrap border-bottom padding-1'>
       <nav
@@ -186,13 +207,13 @@ function renderHeader (props = {}) {
           New
         </button>
         <button
-          .hidden=${isTrashed}
+          .hidden=${!isEntity || isTrashed}
           onclick=${handleMovePage}>
           <hw-icon name='corner-up-right' />
           Move
         </button>
         <button
-          .hidden=${isTrashed}
+          .hidden=${!isEntity || isTrashed}
           onclick=${handleDeletePage}>
           <hw-icon name='trash' />
           Delete

@@ -19,18 +19,20 @@ define('hw-link', {
     document.addEventListener('render', this.render.bind(this))
   },
   async render () {
-    const { entity } = this.dataset
-    if (!entity) {
-      const info = await beaker.hyperdrive.getInfo()
-      this.href = '/'
-      this.html`<span class='title'>${info.title}</span>`
-      return
-    }
-    const path = getPageFilePath()
-    const { metadata } = await beaker.hyperdrive.stat(path)
-    const icon = metadata.icon || PAGE_ICON
-    const title = metadata.title || PAGE_TITLE
-    this.href = getEntityPath(entity)
-    this.html`${icon} <span class='title'>${title}</span>`
+    try {
+      const { entity } = this.dataset
+      if (!entity) {
+        const info = await beaker.hyperdrive.getInfo()
+        this.href = '/'
+        this.html`<span class='title'>${info.title}</span>`
+        return
+      }
+      const path = getPageFilePath(entity)
+      const { metadata } = await beaker.hyperdrive.stat(path)
+      const icon = metadata.icon || PAGE_ICON
+      const title = metadata.title || PAGE_TITLE
+      this.href = getEntityPath(entity)
+      this.html`${icon} <span class='title'>${title}</span>`
+    } catch (e) {}
   }
 })

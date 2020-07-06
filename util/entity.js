@@ -1,4 +1,4 @@
-const DATA_FOLDER = '/data'
+export const DATA_FOLDER = '/data'
 
 export function getDataPath (entity = getEntityId()) {
   return `${DATA_FOLDER}${getEntityPath(entity)}`
