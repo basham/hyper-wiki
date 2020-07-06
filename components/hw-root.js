@@ -76,11 +76,7 @@ async function renderFile () {
   return html`
     ${renderHeader()}
     <main class='page padding-8'>
-      <div class='padding-t-4'>
-        <article class='padding-4'>
-        ${html([content])}
-        </article>
-      </div>
+      ${html([content])}
     </main>
   `
 }
@@ -342,7 +338,7 @@ async function parseFile (path) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-  return `<pre>${escapedTxt}</pre>`
+  return `<pre><div class='fs-1'>${escapedTxt}</div></pre>`
 }
 
 function dispatch (eventName) {

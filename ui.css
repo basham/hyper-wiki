@@ -99,12 +99,17 @@ dt:not(:first-child) {
 
 dd,
 dl,
-p {
+p,
+pre {
   margin: 0;
 }
 
 p:not(:first-child) {
   padding-top: var(--size-2);
+}
+
+pre {
+  overflow: scroll;
 }
 
 button {
