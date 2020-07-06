@@ -46,22 +46,25 @@ function render404 () {
 
 async function renderIndex () {
   const info = await beaker.hyperdrive.getInfo()
-  const pages = (await getPages())
-    .map(({ stat }) => stat.metadata.entity)
+  const pages = await getPages()
   return html`
     ${renderHeader()}
     <main class='page padding-8'>
       <h1>${info.title}</h1>
-      <div class='padding-t-4'>
-        <ul class='list-plain'>
-          ${pages.map(renderPageLinkItem)}
-        </ul>
-      </div>
+      <h2>Pages</h2>
+      <ul class='list-plain'>
+        ${pages.active.map(renderPageLinkItem)}
+      </ul>
+      <h2>Trashed</h2>
+      <ul class='list-plain'>
+        ${pages.trashed.map(renderPageLinkItem)}
+      </ul>
     </main>
   `
 }
 
-function renderPageLinkItem (entity) {
+function renderPageLinkItem (props) {
+  const { entity } = props.stat.metadata
   return html`
     <li>
       <a

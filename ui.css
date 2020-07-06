@@ -81,6 +81,13 @@ h1 {
   margin: 0;
 }
 
+h2 {
+  font-size: var(--size-3);
+  line-height: var(--size-4);
+  margin: 0;
+  padding: var(--size-4) 0 0;
+}
+
 a:link {
   color: var(--color-black);
 }
@@ -93,19 +100,21 @@ dt {
   color: var(--color-black-4);
 }
 
-dt:not(:first-child) {
-  padding-top: var(--size-2);
-}
-
 dd,
 dl,
+ol,
 p,
-pre {
+pre,
+ul {
   margin: 0;
+  padding: 0;
 }
 
-p:not(:first-child) {
-  padding-top: var(--size-2);
+dt:not(:first-child),
+ol:not(:first-child),
+p:not(:first-child),
+ul:not(:first-child) {
+  padding-top: var(--size-3);
 }
 
 pre {
@@ -185,8 +194,6 @@ input[type="text"]:focus {
 
 .list-plain {
   list-style-type: none;
-  margin: 0;
-  padding: 0;
 }
 
 .list-pagination li:not(:last-child)::after {
