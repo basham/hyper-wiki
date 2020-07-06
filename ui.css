@@ -49,12 +49,12 @@
   outline-offset: var(--px-2);
 }
 
-[contenteditable="true"]:empty::before {
+[contenteditable]:empty::before {
   color: var(--color-black-2);
   content: attr(placeholder);
 }
 
-[contenteditable="true"]:focus {
+[contenteditable]:focus {
   outline: none;
 }
 

@@ -1,7 +1,8 @@
 import { define, html } from 'https://cdn.pika.dev/uce'
 import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
+import { dateFormat } from '../util/date.js'
 import { getEntityId } from '../util/entity.js'
-import { deleteEntity, isEntityTrashed, restoreEntity } from '../util/trash.js'
+import { deleteEntity, getTrashTime, isEntityTrashed, restoreEntity } from '../util/trash.js'
 import { createPage, getPageFilePath, updatePageTitle } from '../util/page.js'
 
 let pathname = location.pathname
@@ -73,6 +74,8 @@ async function renderEntity () {
   document.getElementById('favicon').href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icon}</text></svg>`
 
   const isTrashed = await isEntityTrashed()
+  const trashTime = isTrashed ? await getTrashTime() : null
+
   /*
   const breadcrumbs = await getBreadcrumbs(pathname)
   const breadcrumbsHTML = breadcrumbs.map((path) =>
@@ -150,6 +153,8 @@ async function renderEntity () {
             <dd>🕓 ${dateFormat(ctime)}</dt>
             <dt>Updated</dt>
             <dd>🕓 ${dateFormat(mtime)}</dt>
+            <dt .hidden=${!isTrashed}>Deleted</dt>
+            <dd .hidden=${!isTrashed}>🕓 ${dateFormat(trashTime)}</dt>
           </dl>
         </footer>
         <article class='padding-t-4'>
@@ -317,10 +322,6 @@ async function parseFile (path) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
   return `<pre>${escapedTxt}</pre>`
-}
-
-function dateFormat (source) {
-  return (new Date(source)).toLocaleString()
 }
 
 function dispatch (eventName) {
