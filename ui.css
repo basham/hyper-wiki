@@ -133,6 +133,7 @@ button {
   font-size: var(--size-2);
   height: var(--size-4);
   padding: 0 var(--size-1);
+  white-space: nowrap;
 }
 
 button:hover {
@@ -200,16 +201,6 @@ input[type="text"]:focus {
   color: var(--color-black-4);
   content: '/';
   padding: 0 var(--size-1);
-}
-
-.page {
-  margin: 0 auto;
-  max-width: 60rem;
-}
-
-.page__icon {
-  font-size: var(--size-8);
-  line-height: var(--size-8);
 }
 
 
@@ -361,4 +352,15 @@ input[type="text"]:focus {
 
 .pos-rel {
   position: relative;
+}
+
+.sr-only {
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
 }

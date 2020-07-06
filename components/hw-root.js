@@ -1,4 +1,4 @@
-import { define, html } from 'https://cdn.pika.dev/uce'
+import { css, define, html } from 'https://cdn.pika.dev/uce'
 import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 import { dateFormat } from '../util/date.js'
 import { getEntityId } from '../util/entity.js'
@@ -9,6 +9,55 @@ let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
 
 define('hw-root', {
+  style: selector => css`
+    ${selector} {
+      display: grid;
+      grid-template-areas:
+        "header header"
+        "main editor";
+      grid-template-columns: 1fr minmax(20rem, 50vw);
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+    }
+
+    ${selector} .header {
+      grid-area: header;
+    }
+
+    ${selector} .main {
+      grid-area: main;
+      margin: 0 auto;
+      max-width: 60rem;
+      width: 100%;
+    }
+
+    ${selector} .editor {
+      background-color: var(--color-black-0);
+      border-left: var(--px-1) solid var(--color-black-1);
+      grid-area: editor;
+    }
+
+    ${selector} .editor__input {
+      background-color: transparent;
+      border: none;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      min-height: 100%;
+      padding: var(--size-2);
+      resize: none;
+      width: 100%;
+    }
+
+    ${selector} .editor__input:focus {
+      outline: none;
+    }
+
+    ${selector} .icon {
+      font-size: var(--size-8);
+      line-height: var(--size-8);
+    }
+  `,
   async init () {
     this.render()
     document.addEventListener('render', this.render.bind(this))
@@ -134,19 +183,27 @@ async function renderEntity () {
   const header = renderHeader({
     breadcrumbs: html`
       ${breadcrumbsHTML}
-      <li aria-current='page'>
+      <li
+        aria-current='page'
+        class='flex-inline'>
         <a data-entity=${getEntityId()} is='hw-link'></a>
+        <span
+          class='color-text-light padding-l-1'
+          id='page-status'
+          role='status'>
+        </span>
       </li>
     `,
     isEntity: true,
     isTrashed
   })
   const content = await parseFile(getPageFilePath())
+  const rawContent = await beaker.hyperdrive.readFile(getPageFilePath())
 
   return html`
     ${header}
-    <main class='page padding-8'>
-      <div class='page__icon'>${icon}</div>
+    <main class='main padding-8'>
+      <div class='icon'>${icon}</div>
       <div class='padding-t-2'>
         <h1
           contenteditable=${isTrashed ? 'false' : 'true'}
@@ -156,6 +213,11 @@ async function renderEntity () {
           placeholder=${PAGE_TITLE}>
         </h1>
       </div>
+      <article
+        class='padding-t-4'
+        id='content'>
+        ${html([content])}
+      </article>
       <div class='padding-t-4'>
         <dl>
           <dt>Related pages</dt>
@@ -178,18 +240,22 @@ async function renderEntity () {
           <dd .hidden=${!isTrashed}>🕓 ${dateFormat(trashTime)}</dt>
         </dl>
       </div>
-      <article class='padding-t-4'>
-        ${html([content])}
-      </article>
+      <hw-lookup-popup id='lookup' />
     </main>
-    <hw-lookup-popup id='lookup' />
+    <div class='editor'>
+      <textarea
+        class='editor__input'
+        id='editor-input'
+        oninput=${handleEditorInput}
+        .value=${rawContent}></textarea>
+    </div>
   `
 }
 
 function renderHeader (props = {}) {
   const { breadcrumbs = html``, isEntity = false, isTrashed } = props
   return html`
-    <header class='flex flex-middle flex-wrap border-bottom padding-1'>
+    <header class='header flex flex-middle flex-wrap border-bottom padding-1'>
       <nav
         aria-label='Breadcrumbs'
         class='flex-grow'>
@@ -204,6 +270,12 @@ function renderHeader (props = {}) {
         <button onclick=${handleNewPage}>
           <hw-icon name='plus' />
           New
+        </button>
+        <button
+          .hidden=${!isEntity || isTrashed}
+          onclick=${handleSave}>
+          <hw-icon name='save' />
+          Save
         </button>
         <button
           .hidden=${!isEntity || isTrashed}
@@ -245,6 +317,26 @@ async function getBreadcrumbs (path) {
     return [ ...parentPaths, parent ]
   }
   return []
+}
+
+async function handleSave (event) {
+  const { value } = document.getElementById('editor-input')
+  await beaker.hyperdrive.writeFile(getPageFilePath(), value)
+  document.getElementById('page-status').innerHTML = ''
+}
+
+function handleEditorInput (event) {
+  const { target } = event
+  target.style.height = 0
+  target.style.height = `${target.scrollHeight}px`
+
+  const markup = beaker.markdown.toHTML(target.value)
+  document.getElementById('content').innerHTML = markup
+
+  document.getElementById('page-status').innerHTML = `
+    <span aria-hidden='true' title='Unsaved'>*</span>
+    <span class='sr-only'>Unsaved</span>
+  `
 }
 
 async function handleNewPage () {
