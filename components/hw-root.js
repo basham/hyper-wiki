@@ -3,7 +3,7 @@ import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 import { dateFormat } from '../util/date.js'
 import { getEntityId } from '../util/entity.js'
 import { deleteEntity, getTrashTime, isEntityTrashed, restoreEntity } from '../util/trash.js'
-import { createPage, getPageFilePath, getPages, updatePageTitle } from '../util/page.js'
+import { createPage, getPageContentFilePath, getPageData, getPageDataFilePath, getPages, updatePageTitle } from '../util/page.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
@@ -113,7 +113,7 @@ async function renderIndex () {
 }
 
 function renderPageLinkItem (props) {
-  const { entity } = props.stat.metadata
+  const { entity } = props
   return html`
     <li>
       <a
@@ -135,9 +135,10 @@ async function renderFile () {
 
 async function renderEntity () {
   const info = await beaker.hyperdrive.getInfo()
-  const { ctime, mtime, metadata } = await beaker.hyperdrive.stat(getPageFilePath())
-  const { title } = metadata
-  const icon = metadata.icon || PAGE_ICON
+  const { ctime, mtime } = await beaker.hyperdrive.stat(getPageDataFilePath())
+  const pageData = await getPageData()
+  const { title } = pageData.data
+  const icon = pageData.data.icon || PAGE_ICON
   document.title = [(title || PAGE_TITLE), info.title]
     .filter((v) => v)
     .join(' - ')
@@ -197,8 +198,9 @@ async function renderEntity () {
     isEntity: true,
     isTrashed
   })
-  const content = await parseFile(getPageFilePath())
-  const rawContent = await beaker.hyperdrive.readFile(getPageFilePath())
+  const contentPath = getPageContentFilePath()
+  const content = await parseFile(contentPath)
+  const rawContent = await beaker.hyperdrive.readFile(contentPath)
 
   return html`
     ${header}
@@ -321,7 +323,7 @@ async function getBreadcrumbs (path) {
 
 async function handleSave (event) {
   const { value } = document.getElementById('editor-input')
-  await beaker.hyperdrive.writeFile(getPageFilePath(), value)
+  await beaker.hyperdrive.writeFile(getPageContentFilePath(), value)
   document.getElementById('page-status').innerHTML = ''
 }
 

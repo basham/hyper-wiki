@@ -1,18 +1,18 @@
 import { getDataPath, getEntityId } from './entity.js'
 import { fileExists } from './fs.js'
 
-const FILE_NAME = '.trash'
+const FILE_NAME = 'trash.json'
 const TYPE = 'trash'
 const VERSION = 1
 
 export async function deleteEntity (entity = getEntityId()) {
   const path = getTrashFilePath(entity)
-  const metadata = {
+  const data = {
     entity,
     type: TYPE,
     version: VERSION
   }
-  await beaker.hyperdrive.writeFile(path, '', { metadata })
+  await beaker.hyperdrive.writeFile(path, data, 'json')
 }
 
 export function getTrashFilePath (entity) {
