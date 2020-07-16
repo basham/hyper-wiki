@@ -244,7 +244,9 @@ async function renderEntity () {
       </div>
       <hw-lookup-popup id='lookup' />
     </main>
-    <div class='editor'>
+    <div
+      class='editor'
+      .hidden=${isTrashed}>
       <textarea
         class='editor__input'
         id='editor-input'
@@ -257,57 +259,59 @@ async function renderEntity () {
 function renderHeader (props = {}) {
   const { breadcrumbs = html``, isEntity = false, isTrashed } = props
   return html`
-    <header class='header flex flex-middle flex-wrap border-bottom padding-1'>
-      <nav
-        aria-label='Breadcrumbs'
-        class='flex-grow'>
-        <ol class='list-plain list-pagination flex-middle flex-wrap lh-4 padding-1'>
-          <li>
-            <a is='hw-link'></a>
-          </li>
-          ${breadcrumbs}
-        </ol>
-      </nav>
-      <div class='flex flex-gap-1 flex-middle flex-wrap padding-1'>
-        <button onclick=${handleNewPage}>
-          <hw-icon name='plus' />
-          New
-        </button>
-        <button
-          .hidden=${!isEntity || isTrashed}
-          onclick=${handleSave}>
-          <hw-icon name='save' />
-          Save
-        </button>
-        <button
-          .hidden=${!isEntity || isTrashed}
-          onclick=${handleMovePage}>
-          <hw-icon name='corner-up-right' />
-          Move
-        </button>
-        <button
-          .hidden=${!isEntity || isTrashed}
-          onclick=${handleDeletePage}>
-          <hw-icon name='trash' />
-          Delete
-        </button>
+    <header class='header'>
+      <div class='flex flex-middle flex-wrap border-bottom padding-1'>
+        <nav
+          aria-label='Breadcrumbs'
+          class='flex-grow'>
+          <ol class='list-plain list-pagination flex-middle flex-wrap lh-4 padding-1'>
+            <li>
+              <a is='hw-link'></a>
+            </li>
+            ${breadcrumbs}
+          </ol>
+        </nav>
+        <div class='flex flex-gap-1 flex-middle flex-wrap padding-1'>
+          <button onclick=${handleNewPage}>
+            <hw-icon name='plus' />
+            New
+          </button>
+          <button
+            .hidden=${!isEntity || isTrashed}
+            onclick=${handleSave}>
+            <hw-icon name='save' />
+            Save
+          </button>
+          <button
+            .hidden=${!isEntity || isTrashed}
+            onclick=${handleMovePage}>
+            <hw-icon name='corner-up-right' />
+            Move
+          </button>
+          <button
+            .hidden=${!isEntity || isTrashed}
+            onclick=${handleDeletePage}>
+            <hw-icon name='trash' />
+            Delete
+          </button>
+        </div>
+      </div>
+      <div
+        class='bg-black-0 border-bottom padding-2'
+        .hidden=${!isTrashed}>
+        <div class='flex flex-center flex-gap-2 flex-middle flex-wrap'>
+          <div>Page is trashed.</div>
+          <button onclick=${handleRestorePage}>
+            <hw-icon name='rotate-ccw' />
+            Restore
+          </button>
+          <button>
+            <hw-icon name='trash' />
+            Delete permanently
+          </button>
+        </div>
       </div>
     </header>
-    <div
-      class='bg-black-0 border-bottom padding-2'
-      .hidden=${!isTrashed}>
-      <div class='flex flex-center flex-gap-2 flex-middle flex-wrap'>
-        <div>Page is trashed.</div>
-        <button onclick=${handleRestorePage}>
-          <hw-icon name='rotate-ccw' />
-          Restore
-        </button>
-        <button>
-          <hw-icon name='trash' />
-          Delete permanently
-        </button>
-      </div>
-    </div>
   `
 }
 
