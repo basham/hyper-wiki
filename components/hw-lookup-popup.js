@@ -1,6 +1,7 @@
 import cuid from 'https://cdn.pika.dev/cuid'
 import { css, define, html } from 'https://cdn.pika.dev/uce'
-import { FOCUSABLE_ELEMENTS, MAX_RESULTS, PAGE_ICON, PAGE_TITLE } from '../constants.js'
+import { FOCUSABLE_ELEMENTS, MAX_RESULTS } from '../constants.js'
+import { getPages } from '../util/page.js'
 
 define('hw-lookup-popup', {
   style: (selector) => css`
@@ -69,24 +70,11 @@ define('hw-lookup-popup', {
     this._isOpen = true
     this._activeElement = document.activeElement
     document.body.style.overflow = 'hidden'
-    const pages = await beaker.hyperdrive.query({
-      path: '*/*.md',
-      reverse: true,
-      sort: 'mtime',
-      type: 'file'
-    })
-    const pagesIndex = new Map()
-    pages.forEach(({ path, stat }) => {
-      const { icon = PAGE_ICON, parent, title = PAGE_TITLE } = stat.metadata
-      const id = path.replace(/[\/.]/g, '')
-      const page = { icon, id, parent, path, title }
-      pagesIndex.set(path, page)
-    })
-    this._allOptions = Array.from(pagesIndex.values()).map((page) => {
-      const hasParent = pagesIndex.has(page.parent)
-      const parentPage = hasParent ? pagesIndex.get(page.parent) : null
-      return { ...page, hasParent, parentPage }
-    })
+
+    const pages = await getPages()
+    this._allOptions = pages.active.map((page) =>
+      ({ ...page, hasParent: false, parentPage: null })
+    )
     this.setOptions(this._allOptions)
     document.getElementById(this._ids.inputId).focus()
     return new Promise((function (resolve, reject) {
