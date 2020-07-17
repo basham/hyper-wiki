@@ -211,11 +211,11 @@ async function renderEntity () {
         </h1>
       </div>
       <article
-        class='padding-t-4'
+        class='content padding-t-4'
         id='content'>
         ${html([content])}
       </article>
-      <div class='padding-t-4'>
+      <div class='content padding-t-4'>
         <dl>
           <dt>Related pages</dt>
           ${linkRefsHTML}

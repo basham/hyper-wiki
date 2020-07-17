@@ -110,10 +110,10 @@ ul {
   padding: 0;
 }
 
-dt:not(:first-child),
-ol:not(:first-child),
-p:not(:first-child),
-ul:not(:first-child) {
+.content dt:not(:first-child),
+.content ol:not(:first-child),
+.content p:not(:first-child),
+.content ul:not(:first-child) {
   padding-top: var(--size-3);
 }
 
