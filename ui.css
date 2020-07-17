@@ -126,6 +126,7 @@ button {
   background-color: var(--color-black-0);
   border: var(--px-1) solid var(--color-black-1);
   border-radius: var(--size-0);
+  box-shadow: 0 0 0 var(--px-1) var(--color-white);
   color: var(--color-black-7);
   cursor: pointer;
   display: inline-flex;
