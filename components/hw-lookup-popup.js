@@ -24,6 +24,7 @@ define('hw-lookup-popup', {
     }
 
     ${selector} .popup__icon {
+      --icon-size: var(--size-3);
       left: var(--size-1);
       position: absolute;
       top: var(--size-1);

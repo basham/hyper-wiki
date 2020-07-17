@@ -160,9 +160,10 @@ button > hw-icon {
 
 .button-icon {
   background-color: transparent;
-  border: var(--px-2) solid transparent;
+  border: var(--px-1) solid transparent;
+  box-shadow: none;
   color: var(--color-black-6);
-  padding: 0 var(--px-2);
+  padding: 0 calc(7rem/16);
 }
 
 .button-icon:hover {

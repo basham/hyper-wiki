@@ -5,17 +5,18 @@ const sprites = '/.ui/icons.svg'
 define('hw-icon', {
   style: selector => css`
     ${selector} {
+      --icon-size: var(--size-2);
       display: flex;
     }
 
     ${selector} svg {
       fill: none;
-      height: var(--size-2);
+      height: var(--icon-size);
       stroke: currentColor;
       stroke-linecap: round;
       stroke-linejoin: round;
       stroke-width: calc(2rem/16);
-      width: var(--size-2);
+      width: var(--icon-size);
     }
   `,
   init () {
