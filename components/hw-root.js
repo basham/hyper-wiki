@@ -215,6 +215,10 @@ async function renderEntity () {
         id='content'>
         ${html([content])}
       </article>
+      <div class='padding-t-4'>
+        <h2>Dates</h2>
+        <hw-dates />
+      </div>
       <div class='content padding-t-4'>
         <dl>
           <dt>Related pages</dt>
