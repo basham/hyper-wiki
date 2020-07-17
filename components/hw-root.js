@@ -1,9 +1,8 @@
 import { css, define, html } from 'https://cdn.pika.dev/uce'
-import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 import { dateFormat } from '../util/date.js'
 import { getEntityId } from '../util/entity.js'
-import { deleteEntity, getTrashTime, isEntityTrashed, restoreEntity } from '../util/trash.js'
-import { createPage, getPageContentFilePath, getPageData, getPageDataFilePath, getPages, updatePageTitle } from '../util/page.js'
+import { deleteEntity, restoreEntity } from '../util/trash.js'
+import { createPage, getPage, getPages, updatePage } from '../util/page.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
@@ -104,9 +103,9 @@ async function renderIndex () {
       <ul class='list-plain'>
         ${pages.active.map(renderPageLinkItem)}
       </ul>
-      <h2>Trashed</h2>
+      <h2>Trash</h2>
       <ul class='list-plain'>
-        ${pages.trashed.map(renderPageLinkItem)}
+        ${pages.deleted.map(renderPageLinkItem)}
       </ul>
     </main>
   `
@@ -135,17 +134,16 @@ async function renderFile () {
 
 async function renderEntity () {
   const info = await beaker.hyperdrive.getInfo()
-  const { ctime, mtime } = await beaker.hyperdrive.stat(getPageDataFilePath())
-  const pageData = await getPageData()
-  const { title } = pageData.data
-  const icon = pageData.data.icon || PAGE_ICON
-  document.title = [(title || PAGE_TITLE), info.title]
+  const page = await getPage()
+  const { ctime, dtime, mtime, deleted } = page
+  const { content, icon, title } = page
+  const { defaultTitle } = page
+  const { rawContent, rawTitle } = page
+
+  document.title = [title, info.title]
     .filter((v) => v)
     .join(' - ')
   document.getElementById('favicon').href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${icon}</text></svg>`
-
-  const isTrashed = await isEntityTrashed()
-  const trashTime = isTrashed ? await getTrashTime() : null
 
   /*
   const breadcrumbs = await getBreadcrumbs(pathname)
@@ -196,11 +194,8 @@ async function renderEntity () {
       </li>
     `,
     isEntity: true,
-    isTrashed
+    deleted
   })
-  const contentPath = getPageContentFilePath()
-  const content = await parseFile(contentPath)
-  const rawContent = await beaker.hyperdrive.readFile(contentPath)
 
   return html`
     ${header}
@@ -208,11 +203,11 @@ async function renderEntity () {
       <div class='icon'>${icon}</div>
       <div class='padding-t-2'>
         <h1
-          contenteditable=${isTrashed ? 'false' : 'true'}
-          .innerText=${title}
+          contenteditable=${deleted ? 'false' : 'true'}
+          .innerText=${rawTitle}
           onblur=${handleEditPageTitleBlur}
           onkeydown=${handleEditPageTitleKeydown}
-          placeholder=${PAGE_TITLE}>
+          placeholder=${defaultTitle}>
         </h1>
       </div>
       <article
@@ -238,15 +233,15 @@ async function renderEntity () {
           <dd>🕓 ${dateFormat(ctime)}</dt>
           <dt>Updated</dt>
           <dd>🕓 ${dateFormat(mtime)}</dt>
-          <dt .hidden=${!isTrashed}>Deleted</dt>
-          <dd .hidden=${!isTrashed}>🕓 ${dateFormat(trashTime)}</dt>
+          <dt .hidden=${!deleted}>Deleted</dt>
+          <dd .hidden=${!deleted}>🕓 ${dateFormat(dtime)}</dt>
         </dl>
       </div>
       <hw-lookup-popup id='lookup' />
     </main>
     <div
       class='editor'
-      .hidden=${isTrashed}>
+      .hidden=${deleted}>
       <textarea
         class='editor__input'
         id='editor-input'
@@ -257,7 +252,7 @@ async function renderEntity () {
 }
 
 function renderHeader (props = {}) {
-  const { breadcrumbs = html``, isEntity = false, isTrashed } = props
+  const { breadcrumbs = html``, isEntity = false, deleted } = props
   return html`
     <header class='header'>
       <div class='flex flex-middle flex-wrap border-bottom padding-1'>
@@ -277,19 +272,19 @@ function renderHeader (props = {}) {
             New
           </button>
           <button
-            .hidden=${!isEntity || isTrashed}
+            .hidden=${!isEntity || deleted}
             onclick=${handleSave}>
             <hw-icon name='save' />
             Save
           </button>
           <button
-            .hidden=${!isEntity || isTrashed}
+            .hidden=${!isEntity || deleted}
             onclick=${handleMovePage}>
             <hw-icon name='corner-up-right' />
             Move
           </button>
           <button
-            .hidden=${!isEntity || isTrashed}
+            .hidden=${!isEntity || deleted}
             onclick=${handleDeletePage}>
             <hw-icon name='trash' />
             Delete
@@ -298,7 +293,7 @@ function renderHeader (props = {}) {
       </div>
       <div
         class='bg-black-0 border-bottom padding-2'
-        .hidden=${!isTrashed}>
+        .hidden=${!deleted}>
         <div class='flex flex-center flex-gap-2 flex-middle flex-wrap'>
           <div>Page is trashed.</div>
           <button onclick=${handleRestorePage}>
@@ -327,7 +322,7 @@ async function getBreadcrumbs (path) {
 
 async function handleSave (event) {
   const { value } = document.getElementById('editor-input')
-  await beaker.hyperdrive.writeFile(getPageContentFilePath(), value)
+  await updatePage({ content: value })
   document.getElementById('page-status').innerHTML = ''
 }
 
@@ -371,7 +366,7 @@ async function handleRestorePage () {
 }
 
 async function handleEditPageTitle (event) {
-  await updatePageTitle({ title: event.target.innerText })
+  await updatePage({ title: event.target.innerText })
   dispatch('render')
 }
 

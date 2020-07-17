@@ -21,8 +21,12 @@ export function getTrashFilePath (entity) {
 
 export async function getTrashTime (entity) {
   const path = getTrashFilePath(entity)
-  const { ctime } = await beaker.hyperdrive.stat(path)
-  return ctime
+  try {
+    const { ctime } = await beaker.hyperdrive.stat(path)
+    return ctime
+  } catch (e) {
+    return null
+  }
 }
 
 export async function isEntityTrashed (entity) {

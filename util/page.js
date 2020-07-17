@@ -1,78 +1,106 @@
 import cuid from 'https://cdn.pika.dev/cuid'
 import { DATA_FOLDER, getDataPath, getEntityPath } from './entity.js'
-import { isEntityTrashed } from './trash.js'
+import { getTrashTime, isEntityTrashed } from './trash.js'
+import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 
-const DATA_FILE_NAME = 'page.json'
-const CONTENT_FILE_NAME = 'page.md'
+const FILE_NAME = 'page.json'
 const TYPE = 'page'
 const VERSION = 1
 
 export async function createPage () {
   const entity = cuid()
-  const contentPath = getPageContentFilePath(entity)
-  const dataPath = getPageDataFilePath(entity)
-  const data = {
+  const path = getPageFilePath(entity)
+  const file = {
     entity,
     type: TYPE,
     version: VERSION,
     data: {
       icon: '',
-      title: ''
+      title: '',
+      content: ''
     }
   }
-  await beaker.hyperdrive.writeFile(dataPath, data, 'json')
-  await beaker.hyperdrive.writeFile(contentPath, '')
+  await beaker.hyperdrive.writeFile(path, file, 'json')
   return getEntityPath(entity)
 }
 
-export function getPageContentFilePath (entity) {
-  return `${getDataPath(entity)}${CONTENT_FILE_NAME}`
+export function getEntityFromPath (value) {
+  const match = value.match(/c\w+/)
+  return match ? match[0] : match
 }
 
-export function getPageDataFilePath (entity) {
-  return `${getDataPath(entity)}${DATA_FILE_NAME}`
+export function getPageFilePath (entity) {
+  return `${getDataPath(entity)}${FILE_NAME}`
 }
 
-export async function getPageData (entity) {
-  const path = getPageDataFilePath(entity)
-  return await beaker.hyperdrive.readFile(path, 'json')
+export async function getPage (entity) {
+  const path = getPageFilePath(entity)
+  const file = await readPage(entity)
+  const { data, ...meta } = file
+  const { content: rawContent = '', icon: rawIcon = '', title: rawTitle = '' } = data
+  const { ctime, mtime } = await beaker.hyperdrive.stat(path)
+  const dtime = await getTrashTime(entity)
+  const deleted = await isEntityTrashed(entity)
+  const url = getEntityPath(entity)
+  const defaultIcon = PAGE_ICON
+  const defaultTitle = PAGE_TITLE
+  return {
+    ...meta,
+    ctime,
+    dtime,
+    mtime,
+    deleted,
+    content: beaker.markdown.toHTML(rawContent),
+    defaultIcon,
+    defaultTitle,
+    icon: rawIcon || PAGE_ICON,
+    rawContent,
+    rawIcon,
+    rawTitle,
+    title: rawTitle || PAGE_TITLE,
+    url
+  }
+}
+
+export function getPageFromPath (path) {
+  const entity = getEntityFromPath(path)
+  return getPage(entity)
 }
 
 export async function getPages (query = {}) {
   const results = await beaker.hyperdrive.query({
-    path: `${DATA_FOLDER}/*/${DATA_FILE_NAME}`,
+    path: `${DATA_FOLDER}/*/${FILE_NAME}`,
     reverse: true,
     sort: 'ctime',
     type: 'file',
     ...query
   })
-  const all = await Promise.all(results.map(async ({ path }) => {
-    const data = await beaker.hyperdrive.readFile(path, 'json')
-    const trashed = await isEntityTrashed(data.entity)
-    return [data, trashed]
-  }))
+  const all = await Promise.all(results.map(({ path }) => getPageFromPath(path)))
   const active = all
-    .filter(([data, trashed]) => !trashed)
-    .map(([data]) => data)
-  const trashed = all
-    .filter(([data, trashed]) => trashed)
-    .map(([data]) => data)
+    .filter(({ deleted }) => !deleted)
+  const deleted = all
+    .filter(({ deleted }) => deleted)
   return {
     active,
-    trashed
+    deleted
   }
 }
 
-export async function updatePageTitle (options = {}) {
-  const { entity, title } = options
-  const path = getPageDataFilePath(entity)
-  const data = await getPageData(entity)
-  const newData = {
-    ...data,
+export async function readPage (entity) {
+  const path = getPageFilePath(entity)
+  return await beaker.hyperdrive.readFile(path, 'json')
+}
+
+export async function updatePage (options = {}) {
+  const { entity, ...data } = options
+  const path = getPageFilePath(entity)
+  const file = await readPage(entity)
+  const newFile = {
+    ...file,
     data: {
-      ...data.data,
-      title
+      ...file.data,
+      ...data
     }
   }
-  await beaker.hyperdrive.writeFile(path, newData, 'json')
+  await beaker.hyperdrive.writeFile(path, newFile, 'json')
 }
