@@ -1,5 +1,5 @@
 import { css, define, html } from 'https://cdn.pika.dev/uce'
-import { dateFormat } from '../util/date.js'
+import { displayDateTime } from '../util/date.js'
 import { getEntityId } from '../util/entity.js'
 import { deleteEntity, restoreEntity } from '../util/trash.js'
 import { createPage, getPage, getPages, updatePage } from '../util/page.js'
@@ -234,11 +234,11 @@ async function renderEntity () {
           <dt>Subpages</dt>
           ${subpagesHTML}
           <dt>Created</dt>
-          <dd>🕓 ${dateFormat(ctime)}</dt>
+          <dd>🕓 ${displayDateTime(ctime)}</dt>
           <dt>Updated</dt>
-          <dd>🕓 ${dateFormat(mtime)}</dt>
+          <dd>🕓 ${displayDateTime(mtime)}</dt>
           <dt .hidden=${!deleted}>Deleted</dt>
-          <dd .hidden=${!deleted}>🕓 ${dateFormat(dtime)}</dt>
+          <dd .hidden=${!deleted}>🕓 ${displayDateTime(dtime)}</dt>
         </dl>
       </div>
       <hw-lookup-popup id='lookup' />
