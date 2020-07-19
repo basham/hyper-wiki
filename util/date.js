@@ -66,7 +66,9 @@ export function getDateFilePath (options) {
 }
 
 export function isDateValid (value) {
-  return dayjs(value).isValid()
+  const isTypeValid = ['number', 'string']
+    .includes(typeof value)
+  return isTypeValid && dayjs(value).isValid()
 }
 
 export async function updateDate (options) {
