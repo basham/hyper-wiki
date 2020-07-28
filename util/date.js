@@ -5,7 +5,6 @@ import { sortBy } from './sort.js'
 
 const FILE_NAME = 'date.json'
 const TYPE = 'date'
-const VERSION = 1
 
 const DATE_FORMAT = 'YYYY-MM-DD'
 const DATE_DISPLAY = 'ddd, MMM D, YYYY'
@@ -23,10 +22,9 @@ export async function createDate (data = {}) {
     id,
     entity,
     type: TYPE,
-    version: VERSION,
-    data
+    ...data
   }
-  await beaker.hyperdrive.writeFile(path, file, 'json')
+  await writeDate(entity, id, file)
 }
 
 export async function deleteDate (id) {
@@ -41,10 +39,9 @@ export function formatDate (value) {
 
 export async function getDate (path) {
   const file = await beaker.hyperdrive.readFile(path, 'json')
-  const { data, ...meta } = file
-  const { startDate: rawStartDate } = data
+  const { startDate: rawStartDate } = file
   return {
-    ...meta,
+    ...file,
     rawStartDate,
     startDate: dayjs(rawStartDate).format(DATE_DISPLAY)
   }
@@ -71,15 +68,18 @@ export function isDateValid (value) {
   return isTypeValid && dayjs(value).isValid()
 }
 
-export async function updateDate (options) {
-  const { id, data, entity = getEntityId() } = options
+export async function readDate (entity, id) {
   const path = getDateFilePath({ entity, id })
-  const file = {
-    id,
-    entity,
-    type: TYPE,
-    version: VERSION,
-    data
-  }
-  await beaker.hyperdrive.writeFile(path, file, 'json')
+  return await beaker.hyperdrive.readFile(path, 'json')
+}
+
+export async function updateDate (options) {
+  const { id, entity = getEntityId(), ...data } = options
+  const file = await readDate(entity, id)
+  await writeDate(entity, id, { ...file, ...data })
+}
+
+async function writeDate (entity, id, data) {
+  const path = getDateFilePath({ entity, id })
+  return await beaker.hyperdrive.writeFile(path, data, 'json')
 }

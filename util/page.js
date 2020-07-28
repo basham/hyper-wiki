@@ -1,26 +1,22 @@
 import cuid from 'https://cdn.pika.dev/cuid'
 import { DATA_FOLDER, getDataPath, getEntityPath } from './entity.js'
-import { getTrashTime, isEntityTrashed } from './trash.js'
+import { createStat, getStat, updateEntity } from './stat.js'
 import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
 
 const FILE_NAME = 'page.json'
 const TYPE = 'page'
-const VERSION = 1
 
 export async function createPage () {
   const entity = cuid()
-  const path = getPageFilePath(entity)
   const file = {
     entity,
     type: TYPE,
-    version: VERSION,
-    data: {
-      icon: '',
-      title: '',
-      content: ''
-    }
+    icon: '',
+    title: '',
+    content: ''
   }
-  await beaker.hyperdrive.writeFile(path, file, 'json')
+  await createStat(entity)
+  await writePage(entity, file)
   return getEntityPath(entity)
 }
 
@@ -34,22 +30,15 @@ export function getPageFilePath (entity) {
 }
 
 export async function getPage (entity) {
-  const path = getPageFilePath(entity)
   const file = await readPage(entity)
-  const { data, ...meta } = file
-  const { content: rawContent = '', icon: rawIcon = '', title: rawTitle = '' } = data
-  const { ctime, mtime } = await beaker.hyperdrive.stat(path)
-  const dtime = await getTrashTime(entity)
-  const deleted = await isEntityTrashed(entity)
+  const { content: rawContent = '', icon: rawIcon = '', title: rawTitle = '' } = file
+  const stat = await getStat(entity)
   const url = getEntityPath(entity)
   const defaultIcon = PAGE_ICON
   const defaultTitle = PAGE_TITLE
   return {
-    ...meta,
-    ctime,
-    dtime,
-    mtime,
-    deleted,
+    ...file,
+    ...stat,
     content: beaker.markdown.toHTML(rawContent),
     defaultIcon,
     defaultTitle,
@@ -77,9 +66,9 @@ export async function getPages (query = {}) {
   })
   const all = await Promise.all(results.map(({ path }) => getPageFromPath(path)))
   const active = all
-    .filter(({ deleted }) => !deleted)
+    .filter(({ isDeleted }) => !isDeleted)
   const deleted = all
-    .filter(({ deleted }) => deleted)
+    .filter(({ isDeleted }) => isDeleted)
   return {
     active,
     deleted
@@ -91,16 +80,25 @@ export async function readPage (entity) {
   return await beaker.hyperdrive.readFile(path, 'json')
 }
 
-export async function updatePage (options = {}) {
-  const { entity, ...data } = options
-  const path = getPageFilePath(entity)
+export async function updatePage (entity, data) {
   const file = await readPage(entity)
-  const newFile = {
-    ...file,
-    data: {
-      ...file.data,
-      ...data
-    }
-  }
-  await beaker.hyperdrive.writeFile(path, newFile, 'json')
+  await writePage(entity, { ...file, ...data })
+  await updateEntity(entity)
+}
+
+export async function updatePageContent (entity, content) {
+  await updatePage(entity, { content })
+}
+
+export async function updatePageIcon (entity, icon) {
+  await updatePage(entity, { icon })
+}
+
+export async function updatePageTitle (entity, title) {
+  await updatePage(entity, { title })
+}
+
+async function writePage (entity, data) {
+  const path = getPageFilePath(entity)
+  return await beaker.hyperdrive.writeFile(path, data, 'json')
 }

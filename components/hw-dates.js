@@ -69,9 +69,7 @@ async function editDate (props) {
   }
   await updateDate({
     id,
-    data: {
-      startDate: formatDate(result)
-    }
+    startDate: formatDate(result)
   })
   refresh()
 }

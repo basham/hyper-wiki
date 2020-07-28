@@ -1,11 +1,14 @@
 import { css, define, html } from 'https://cdn.pika.dev/uce'
 import { displayDateTime } from '../util/date.js'
 import { getEntityId } from '../util/entity.js'
-import { deleteEntity, restoreEntity } from '../util/trash.js'
-import { createPage, getPage, getPages, updatePage } from '../util/page.js'
+import { createPage, getPage, getPages, updatePageContent, updatePageTitle } from '../util/page.js'
+import { deleteEntity, restoreEntity } from '../util/stat.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
+
+const ENTITY = getEntityId()
+
 
 define('hw-root', {
   style: selector => css`
@@ -135,7 +138,7 @@ async function renderFile () {
 async function renderEntity () {
   const info = await beaker.hyperdrive.getInfo()
   const page = await getPage()
-  const { ctime, dtime, mtime, deleted } = page
+  const { created, deleted, updated } = page
   const { content, icon, title } = page
   const { defaultTitle } = page
   const { rawContent, rawTitle } = page
@@ -234,11 +237,11 @@ async function renderEntity () {
           <dt>Subpages</dt>
           ${subpagesHTML}
           <dt>Created</dt>
-          <dd>🕓 ${displayDateTime(ctime)}</dt>
+          <dd>🕓 ${displayDateTime(created)}</dt>
           <dt>Updated</dt>
-          <dd>🕓 ${displayDateTime(mtime)}</dt>
+          <dd>🕓 ${displayDateTime(updated)}</dt>
           <dt .hidden=${!deleted}>Deleted</dt>
-          <dd .hidden=${!deleted}>🕓 ${displayDateTime(dtime)}</dt>
+          <dd .hidden=${!deleted}>🕓 ${displayDateTime(deleted)}</dt>
         </dl>
       </div>
       <hw-lookup-popup id='lookup' />
@@ -324,10 +327,11 @@ async function getBreadcrumbs (path) {
   return []
 }
 
-async function handleSave (event) {
+async function handleSave () {
   const { value } = document.getElementById('editor-input')
-  await updatePage({ content: value })
-  document.getElementById('page-status').innerHTML = ''
+  await updatePageContent(ENTITY, value)
+  //document.getElementById('page-status').innerHTML = ''
+  dispatch('render')
 }
 
 function handleEditorInput (event) {
@@ -360,17 +364,17 @@ async function handleMovePage () {
 }
 
 async function handleDeletePage () {
-  await deleteEntity()
+  await deleteEntity(ENTITY)
   dispatch('render')
 }
 
 async function handleRestorePage () {
-  await restoreEntity()
+  await restoreEntity(ENTITY)
   dispatch('render')
 }
 
 async function handleEditPageTitle (event) {
-  await updatePage({ title: event.target.innerText })
+  await updatePageTitle(ENTITY, event.target.innerText)
   dispatch('render')
 }
 
