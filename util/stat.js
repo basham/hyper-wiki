@@ -1,4 +1,5 @@
 import { getDataPath } from './entity.js'
+import { fileExists } from './fs.js'
 
 const FILE_NAME = 'stat.json'
 const TYPE = 'stat'
@@ -48,6 +49,11 @@ export async function getStat (entity) {
 
 export function getStatFilePath (entity) {
   return `${getDataPath(entity)}${FILE_NAME}`
+}
+
+export async function hasStat (entity) {
+  const path = getStatFilePath(entity)
+  return await fileExists(path)
 }
 
 export async function readStat (entity) {
