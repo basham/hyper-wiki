@@ -87,6 +87,7 @@ export async function updatePage (entity, data) {
 }
 
 export async function updatePageContent (entity, content) {
+  console.log('##', entity, content)
   await updatePage(entity, { content })
 }
 

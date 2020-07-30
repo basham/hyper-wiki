@@ -56,7 +56,11 @@ define('hw-view-page', {
       line-height: var(--size-8);
     }
   `,
-  async init () {
+  init () {
+    document.addEventListener('render', this.render.bind(this))
+    this.render()
+  },
+  async render () {
     const props = await load()
     this.html`${render(props)}`
   }
@@ -64,12 +68,21 @@ define('hw-view-page', {
 
 async function load () {
   const page = await getPage()
-  return page
+  const { deleted, rawContent } = page
+  const editor = document.getElementById('editor-input')
+  const editorValue = editor && !deleted ? editor.value : rawContent
+  const unsaved = editorValue !== rawContent && !deleted
+  return {
+    ...page,
+    content: beaker.markdown.toHTML(editorValue),
+    editorValue,
+    unsaved
+  }
 }
 
 function render (props) {
   const { entity, created, deleted, updated } = props
-  const { content, defaultTitle, icon, rawContent, rawTitle, title } = props
+  const { content, defaultTitle, editorValue, icon, rawTitle, title, unsaved } = props
 
   const linkRefsHTML = html``
   const subpagesHTML = html``
@@ -80,7 +93,8 @@ function render (props) {
       deleted=${deleted}
       entity=${entity}
       icon=${icon}
-      title=${title} />
+      title=${title}
+      unsaved=${unsaved} />
     <main class='main padding-8'>
       <div class='icon'>${icon}</div>
       <div class='padding-t-2'>
@@ -132,7 +146,7 @@ function render (props) {
         class='editor__input'
         id='editor-input'
         oninput=${handleEditorInput}
-        .value=${rawContent}></textarea>
+        .value=${editorValue}></textarea>
     </div>
   `
 }
@@ -151,14 +165,7 @@ function handleEditorInput (event) {
   const { target } = event
   target.style.height = 0
   target.style.height = `${target.scrollHeight}px`
-
-  const markup = beaker.markdown.toHTML(target.value)
-  document.getElementById('content').innerHTML = markup
-
-  document.getElementById('page-status').innerHTML = `
-    <span aria-hidden='true' title='Unsaved'>*</span>
-    <span class='sr-only'>Unsaved</span>
-  `
+  dispatch('render')
 }
 
 async function handleEditPageTitle (event) {
@@ -217,8 +224,6 @@ async function removeLink (fromPath, path) {
     await beaker.hyperdrive.deleteMetadata(fromPath, 'links')
   }
 }
-
-  //const editor = document.getElementById('editor-input')
 
   /*
   const linkRefs = await beaker.hyperdrive.query({

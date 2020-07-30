@@ -7,7 +7,7 @@ define('hw-header', {
   init () {
     this.render()
   },
-  observedAttributes: ['deleted', 'entity', 'icon', 'title'],
+  observedAttributes: ['deleted', 'entity', 'icon', 'title', 'unsaved'],
   attributeChanged () {
     this.render()
   },
@@ -18,7 +18,7 @@ define('hw-header', {
 })
 
 async function load (props) {
-  const { title } = props
+  const { title, unsaved } = props
   const info = await beaker.hyperdrive.getInfo()
   const driveTitle = info.title
   const documentTitle = [title, driveTitle]
@@ -27,12 +27,13 @@ async function load (props) {
   return {
     ...props,
     documentTitle,
-    driveTitle
+    driveTitle,
+    unsaved: unsaved === 'true'
   }
 }
 
 function render (props) {
-  const { deleted = false, driveTitle, entity = false } = props
+  const { deleted = false, driveTitle, entity = false, unsaved } = props
   updateDocumentHead(props)
   return html`
     <header class='header'>
@@ -54,7 +55,7 @@ function render (props) {
           </button>
           <button
             .hidden=${!entity || deleted}
-            onclick=${handleSave}>
+            onclick=${handleSave(props)}>
             <hw-icon name='save' />
             Save
           </button>
@@ -66,7 +67,7 @@ function render (props) {
           </button>
           <button
             .hidden=${!entity || deleted}
-            onclick=${handleDeletePage}>
+            onclick=${handleDeletePage(props)}>
             <hw-icon name='trash' />
             Delete
           </button>
@@ -77,7 +78,7 @@ function render (props) {
         .hidden=${!deleted}>
         <div class='flex flex-center flex-gap-2 flex-middle flex-wrap'>
           <div>Page is trashed.</div>
-          <button onclick=${handleRestorePage}>
+          <button onclick=${handleRestorePage(props)}>
             <hw-icon name='rotate-ccw' />
             Restore
           </button>
@@ -107,8 +108,20 @@ function renderCurrentPage (props) {
         class='color-text-light padding-l-1'
         id='page-status'
         role='status'>
+        ${renderUnsaved(props)}
       </span>
     </li>
+  `
+}
+
+function renderUnsaved (props) {
+  const { unsaved } = props
+  if (!unsaved) {
+    return null
+  }
+  return html`
+    <span aria-hidden='true' title='Unsaved'>*</span>
+    <span class='sr-only'>Unsaved</span>
   `
 }
 
@@ -136,21 +149,29 @@ async function handleMovePage () {
   } catch (error) {}
 }
 
-async function handleDeletePage () {
-  await deleteEntity(ENTITY)
-  dispatch('render')
+function handleDeletePage (props) {
+  const { entity } = props
+  return async () => {
+    await deleteEntity(entity)
+    dispatch('render')
+  }
 }
 
-async function handleRestorePage () {
-  await restoreEntity(ENTITY)
-  dispatch('render')
+function handleRestorePage (props) {
+  const { entity } = props
+  return async () => {
+    await restoreEntity(entity)
+    dispatch('render')
+  }
 }
 
-async function handleSave () {
-  const { value } = document.getElementById('editor-input')
-  await updatePageContent(ENTITY, value)
-  //document.getElementById('page-status').innerHTML = ''
-  dispatch('render')
+function handleSave (props) {
+  const { entity } = props
+  return async () => {
+    const { value } = document.getElementById('editor-input')
+    await updatePageContent(entity, value)
+    dispatch('render')
+  }
 }
 
 /*
