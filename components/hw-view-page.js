@@ -101,8 +101,8 @@ function render (props) {
         <h1
           contenteditable=${deleted ? 'false' : 'true'}
           .innerText=${rawTitle}
-          onblur=${handleEditPageTitleBlur}
-          onkeydown=${handleEditPageTitleKeydown}
+          onblur=${handleEditPageTitleBlur(props)}
+          onkeydown=${handleEditPageTitleKeydown(props)}
           placeholder=${defaultTitle}>
         </h1>
       </div>
@@ -168,19 +168,24 @@ function handleEditorInput (event) {
   dispatch('render')
 }
 
-async function handleEditPageTitle (event) {
-  await updatePageTitle(ENTITY, event.target.innerText)
+async function handleEditPageTitle (props, event) {
+  const { entity } = props
+  await updatePageTitle(entity, event.target.innerText)
   dispatch('render')
 }
 
-async function handleEditPageTitleBlur (event) {
-  await handleEditPageTitle(event)
+function handleEditPageTitleBlur (props) {
+  return async (event) => {
+    await handleEditPageTitle(props, event)
+  }
 }
 
-async function handleEditPageTitleKeydown (event) {
-  if (event.key === 'Enter') {
-    event.preventDefault()
-    await handleEditPageTitle(event)
+function handleEditPageTitleKeydown (props) {
+  return async (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      await handleEditPageTitle(props, event)
+    }
   }
 }
 
