@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Wiki front-end for Beaker Browser, inspired by Notion.",
   "scripts": {
-    "install": "snowpack install"
+    "postinstall": "snowpack install"
   },
   "repository": {
     "type": "git",
@@ -28,13 +28,6 @@
       "cuid",
       "dayjs",
       "uce"
-    ],
-    "installOptions": {
-      "sourceMapx": false,
-      "minify": true
-    },
-    "buildOptions": {
-      
-    }
+    ]
   }
 }
