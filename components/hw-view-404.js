@@ -1,4 +1,4 @@
-import { define, html } from 'https://cdn.pika.dev/uce'
+import { define, html } from '../web_modules/uce.js'
 
 define('hw-view-404', {
   async init () {

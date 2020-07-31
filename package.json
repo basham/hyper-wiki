@@ -1,0 +1,40 @@
+{
+  "name": "hyper-wiki",
+  "version": "1.0.0",
+  "description": "Wiki front-end for Beaker Browser, inspired by Notion.",
+  "scripts": {
+    "install": "snowpack install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/basham/hyper-wiki.git"
+  },
+  "author": "Chris Basham <chris@bash.am>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/basham/hyper-wiki/issues"
+  },
+  "homepage": "https://github.com/basham/hyper-wiki#readme",
+  "devDependencies": {
+    "snowpack": "2.7.4"
+  },
+  "dependencies": {
+    "cuid": "2.1.8",
+    "dayjs": "1.8.31",
+    "uce": "1.5.1"
+  },
+  "snowpack": {
+    "install": [
+      "cuid",
+      "dayjs",
+      "uce"
+    ],
+    "installOptions": {
+      "sourceMapx": false,
+      "minify": true
+    },
+    "buildOptions": {
+      
+    }
+  }
+}

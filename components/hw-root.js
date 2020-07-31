@@ -1,4 +1,4 @@
-import { define, html } from 'https://cdn.pika.dev/uce'
+import { define, html } from '../web_modules/uce.js'
 import { fileExists } from '../util/fs.js'
 import { hasStat } from '../util/stat.js'
 

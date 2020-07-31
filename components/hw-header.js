@@ -1,4 +1,4 @@
-import { define, html } from 'https://cdn.pika.dev/uce'
+import { define, html } from '../web_modules/uce.js'
 import { dispatch } from '../util/dom.js'
 import { createPage, updatePageContent } from '../util/page.js'
 import { deleteEntity, restoreEntity } from '../util/stat.js'

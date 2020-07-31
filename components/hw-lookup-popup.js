@@ -1,5 +1,5 @@
-import cuid from 'https://cdn.pika.dev/cuid'
-import { css, define, html } from 'https://cdn.pika.dev/uce'
+import cuid from '../web_modules/cuid.js'
+import { css, define, html } from '../web_modules/uce.js'
 import { FOCUSABLE_ELEMENTS, MAX_RESULTS } from '../constants.js'
 import { getPages } from '../util/page.js'
 

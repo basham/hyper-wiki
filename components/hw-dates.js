@@ -1,4 +1,4 @@
-import { css, define, html } from 'https://cdn.pika.dev/uce'
+import { css, define, html } from '../web_modules/uce.js'
 import { getDates, createDate, deleteDate, formatDate, isDateValid, updateDate } from '../util/date.js'
 
 define('hw-dates', {

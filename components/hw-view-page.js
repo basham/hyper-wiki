@@ -1,4 +1,4 @@
-import { css, define, html } from 'https://cdn.pika.dev/uce'
+import { css, define, html } from '../web_modules/uce.js'
 import { displayDateTime } from '../util/date.js'
 import { dispatch } from '../util/dom.js'
 import { getPage, updatePageTitle } from '../util/page.js'
@@ -38,7 +38,7 @@ define('hw-view-page', {
     ${selector} .editor__input {
       background-color: transparent;
       border: none;
-      font-family: inherit;
+      font-family: var(--font-code);
       font-size: inherit;
       line-height: inherit;
       min-height: 100%;

@@ -1,4 +1,4 @@
-import { css, define } from 'https://cdn.pika.dev/uce'
+import { css, define } from '../web_modules/uce.js'
 import { getPage } from '../util/page.js'
 
 define('hw-link', {

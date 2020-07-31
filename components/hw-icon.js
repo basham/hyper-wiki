@@ -1,4 +1,4 @@
-import { css, define } from 'https://cdn.pika.dev/uce'
+import { css, define } from '../web_modules/uce.js'
 
 const sprites = '/.ui/icons.svg'
 

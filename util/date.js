@@ -1,5 +1,5 @@
-import cuid from 'https://cdn.pika.dev/cuid'
-import dayjs from 'https://cdn.pika.dev/dayjs'
+import cuid from '../web_modules/cuid.js'
+import dayjs from '../web_modules/dayjs.js'
 import { DATA_FOLDER, getDataPath, getEntityId } from './entity.js'
 import { sortBy } from './sort.js'
 

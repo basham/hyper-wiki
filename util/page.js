@@ -1,4 +1,4 @@
-import cuid from 'https://cdn.pika.dev/cuid'
+import cuid from '../web_modules/cuid.js'
 import { DATA_FOLDER, getDataPath, getEntityPath } from './entity.js'
 import { createStat, getStat, updateEntity } from './stat.js'
 import { PAGE_ICON, PAGE_TITLE } from '../constants.js'

@@ -1,4 +1,4 @@
-import { define, html } from 'https://cdn.pika.dev/uce'
+import { define, html } from '../web_modules/uce.js'
 import { getPages } from '../util/page.js'
 
 define('hw-view-index', {
