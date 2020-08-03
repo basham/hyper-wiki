@@ -295,6 +295,10 @@ input[type="text"]:focus {
   display: flex;
 }
 
+.flex-basis-20 {
+  flex-basis: 20rem;
+}
+
 .flex-center {
   justify-content: center;
 }
@@ -313,6 +317,14 @@ input[type="text"]:focus {
 
 .flex-gap-2 > * {
   margin: var(--size-1);
+}
+
+.flex-gap-4 {
+  margin: calc(var(--size-2) * -1);
+}
+
+.flex-gap-4 > * {
+  margin: var(--size-2);
 }
 
 .flex-grow {

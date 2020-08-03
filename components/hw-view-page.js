@@ -8,25 +8,17 @@ if (pathname.endsWith('/')) pathname += 'index.html'
 
 define('hw-view-page', {
   style: selector => css`
-    ${selector} {
-      display: grid;
-      grid-template-areas:
-        "header header"
-        "main editor";
-      grid-template-columns: 50%;
-      grid-template-rows: auto 1fr;
-      min-height: 100vh;
-    }
-
-    ${selector} .header {
-      grid-area: header;
-    }
-
     ${selector} .main {
-      grid-area: main;
       margin: 0 auto;
-      max-width: 60rem;
+      max-width: 80rem;
       width: 100%;
+    }
+
+    ${selector} .button-icon {
+      font-size: var(--size-8);
+      height: inherit;
+      line-height: var(--size-8);
+      padding: var(--size-0);
     }
 
     ${selector} .heading {
@@ -38,8 +30,8 @@ define('hw-view-page', {
 
     ${selector} .editor {
       background-color: var(--color-black-0);
-      border-left: var(--px-1) solid var(--color-black-1);
-      grid-area: editor;
+      border: var(--border);
+      border-radius: var(--size-0);
     }
 
     ${selector} .editor__input {
@@ -57,13 +49,6 @@ define('hw-view-page', {
     ${selector} .editor__input:focus {
       outline: none;
     }
-
-    ${selector} .button-icon {
-      font-size: var(--size-8);
-      height: inherit;
-      line-height: var(--size-8);
-      padding: var(--size-0);
-    }
   `,
   init () {
     document.addEventListener('render', this.render.bind(this))
@@ -72,6 +57,7 @@ define('hw-view-page', {
   async render () {
     const props = await load()
     this.html`${render(props)}`
+    resizeEditor()
   }
 })
 
@@ -98,7 +84,6 @@ function render (props) {
 
   return html`
     <hw-header
-      class='header'
       deleted=${deleted}
       entity=${entity}
       icon=${icon}
@@ -122,11 +107,22 @@ function render (props) {
           placeholder=${defaultTitle}>
         </h1>
       </div>
-      <article
-        class='content padding-t-4'
-        id='content'>
-        ${html([content])}
-      </article>
+      <div class='flex flex-gap-4 flex-wrap padding-t-4'>
+        <article
+          class='content flex-basis-20 flex-grow'
+          id='content'>
+          ${html([content])}
+        </article>
+        <div
+          class='editor flex-basis-20 flex-grow'
+          .hidden=${deleted}>
+          <textarea
+            class='editor__input'
+            id='editor-input'
+            oninput=${handleEditorInput}
+            .value=${editorValue}></textarea>
+        </div>
+      </div>
       <div class='padding-t-4'>
         <h2>Dates</h2>
         <hw-dates />
@@ -155,15 +151,6 @@ function render (props) {
       </div>
       <hw-lookup-popup id='lookup' />
     </main>
-    <div
-      class='editor'
-      .hidden=${deleted}>
-      <textarea
-        class='editor__input'
-        id='editor-input'
-        oninput=${handleEditorInput}
-        .value=${editorValue}></textarea>
-    </div>
   `
 }
 
@@ -177,10 +164,15 @@ async function getBreadcrumbs (path) {
   return []
 }
 
-function handleEditorInput (event) {
-  const { target } = event
-  target.style.height = 0
-  target.style.height = `${target.scrollHeight}px`
+function resizeEditor () {
+  const editor = document.getElementById('editor-input')
+  if (editor) {
+    editor.style.height = 0
+    editor.style.height = `${editor.scrollHeight}px`
+  }
+}
+
+function handleEditorInput () {
   dispatch('render')
 }
 
