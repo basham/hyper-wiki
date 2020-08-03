@@ -29,6 +29,13 @@ define('hw-view-page', {
       width: 100%;
     }
 
+    ${selector} .heading {
+      font-size: var(--size-5);
+      line-height: var(--size-6);
+      margin: 0;
+      padding: 0;
+    }
+
     ${selector} .editor {
       background-color: var(--color-black-0);
       border-left: var(--px-1) solid var(--color-black-1);
@@ -99,6 +106,7 @@ function render (props) {
       <div class='icon'>${icon}</div>
       <div class='padding-t-2'>
         <h1
+          class='heading'
           contenteditable=${deleted ? 'false' : 'true'}
           .innerText=${rawTitle}
           onblur=${handleEditPageTitleBlur(props)}

@@ -102,21 +102,24 @@ body {
   padding: 0;
 }
 
-h1 {
+.content h1 {
   font-size: var(--size-4);
   line-height: var(--size-5);
   margin: var(--size-5) 0 0;
   padding: 0;
 }
 
-h2 {
+.content h2 {
   font-size: var(--size-3);
   line-height: var(--size-4);
   margin: var(--size-4) 0 0;
   padding: 0;
 }
 
-h3 {
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
   font-size: var(--size-2);
   line-height: var(--size-3);
   margin: var(--size-3) 0 0;
@@ -145,13 +148,17 @@ ul {
   padding: 0;
 }
 
-.content dt:not(:first-child),
-.content ol:not(:first-child),
-.content p:not(:first-child),
-.content pre:not(:first-child),
-.content table:not(:first-child),
-.content ul:not(:first-child) {
+.content dt,
+.content ol,
+.content p,
+.content pre,
+.content table,
+.content ul {
   margin-top: var(--size-3);
+}
+
+.content :first-child {
+  margin-top: 0;
 }
 
 code {
