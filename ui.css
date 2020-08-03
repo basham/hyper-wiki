@@ -157,7 +157,7 @@ ul {
   margin-top: var(--size-3);
 }
 
-.content :first-child {
+.content > :first-child {
   margin-top: 0;
 }
 
