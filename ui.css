@@ -105,14 +105,22 @@ body {
 h1 {
   font-size: var(--size-4);
   line-height: var(--size-5);
-  margin: 0;
+  margin: var(--size-5) 0 0;
+  padding: 0;
 }
 
 h2 {
   font-size: var(--size-3);
   line-height: var(--size-4);
-  margin: 0;
-  padding: var(--size-4) 0 0;
+  margin: var(--size-4) 0 0;
+  padding: 0;
+}
+
+h3 {
+  font-size: var(--size-2);
+  line-height: var(--size-3);
+  margin: var(--size-3) 0 0;
+  padding: 0;
 }
 
 a:link {
