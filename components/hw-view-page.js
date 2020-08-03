@@ -28,25 +28,26 @@ define('hw-view-page', {
       padding: 0;
     }
 
-    ${selector} .editor {
-      background-color: var(--color-black-0);
-      border: var(--border);
-      border-radius: var(--size-0);
+    ${selector} .content-area {
+      display: grid;
+      gap: var(--size-8);
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
     }
 
-    ${selector} .editor__input {
+    ${selector} .editor-input {
       background-color: transparent;
-      border: none;
-      font-family: var(--font-code);
+      border: var(--border);
+      border-radius: var(--size-0);
       font-size: inherit;
       line-height: inherit;
-      min-height: 100%;
+      overflow: hidden;
       padding: var(--size-2);
       resize: none;
       width: 100%;
     }
 
-    ${selector} .editor__input:focus {
+    ${selector} .editor-input:focus {
+      border-color: var(--color-blue-6);
       outline: none;
     }
   `,
@@ -107,21 +108,24 @@ function render (props) {
           placeholder=${defaultTitle}>
         </h1>
       </div>
-      <div class='flex flex-gap-4 flex-wrap padding-t-4'>
+      <div class='content-area padding-t-4'>
+        <div
+          class='flex-basis-20 flex-grow'
+          .hidden=${deleted}>
+          <textarea
+            aria-label='Content'
+            class='editor-input'
+            id='editor-input'
+            oninput=${handleEditorInput}
+            placeholder='Enter content…'
+            rows='1'
+            .value=${editorValue}></textarea>
+        </div>
         <article
           class='content flex-basis-20 flex-grow'
           id='content'>
           ${html([content])}
         </article>
-        <div
-          class='editor flex-basis-20 flex-grow'
-          .hidden=${deleted}>
-          <textarea
-            class='editor__input'
-            id='editor-input'
-            oninput=${handleEditorInput}
-            .value=${editorValue}></textarea>
-        </div>
       </div>
       <div class='padding-t-4'>
         <h2>Dates</h2>
@@ -167,12 +171,13 @@ async function getBreadcrumbs (path) {
 function resizeEditor () {
   const editor = document.getElementById('editor-input')
   if (editor) {
-    editor.style.height = 0
+    editor.style.height = 'auto'
     editor.style.height = `${editor.scrollHeight}px`
   }
 }
 
 function handleEditorInput () {
+  resizeEditor()
   dispatch('render')
 }
 
