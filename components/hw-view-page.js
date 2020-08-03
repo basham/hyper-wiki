@@ -194,9 +194,12 @@ function handleEditPageIcon (props) {
 }
 
 async function handleEditPageTitle (props, event) {
-  const { entity } = props
-  await updatePageTitle(entity, event.target.innerText)
-  dispatch('render')
+  const { entity, rawTitle } = props
+  const newTitle = event.target.innerText
+  if (newTitle !== rawTitle) {
+    await updatePageTitle(entity, newTitle)
+    dispatch('render')
+  }
 }
 
 function handleEditPageTitleBlur (props) {
