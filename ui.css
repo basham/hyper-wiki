@@ -140,6 +140,7 @@ dt {
 
 dd,
 dl,
+hr,
 ol,
 p,
 pre,
@@ -149,6 +150,7 @@ ul {
 }
 
 .content dt,
+.content hr,
 .content ol,
 .content p,
 .content pre,
@@ -182,6 +184,10 @@ th {
   border: var(--border);
   padding: var(--size-1) var(--size-2);
   text-align: left;
+}
+
+hr {
+  border: var(--border);
 }
 
 button {
