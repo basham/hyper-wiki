@@ -13,7 +13,7 @@ define('hw-view-page', {
       grid-template-areas:
         "header header"
         "main editor";
-      grid-template-columns: 1fr minmax(20rem, 50vw);
+      grid-template-columns: 50%;
       grid-template-rows: auto 1fr;
       min-height: 100vh;
     }
