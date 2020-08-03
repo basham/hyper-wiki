@@ -188,8 +188,10 @@ function handleEditPageIcon (props) {
   const { entity, rawIcon } = props
   return async () => {
     const result = prompt('Edit icon', rawIcon)
-    await updatePageIcon(entity, result)
-    dispatch('render')
+    if (result !== false) {
+      await updatePageIcon(entity, result)
+      dispatch('render')
+    }
   }
 }
 
