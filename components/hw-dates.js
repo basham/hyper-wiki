@@ -10,43 +10,52 @@ define('hw-dates', {
     this.render()
     document.addEventListener('dates-updated', this.render.bind(this))
   },
+  observedAttributes: ['readonly'],
+  attributeChanged () {
+    this.render()
+  },
   async render () {
     const dates = await getDates()
-    const props = { dates }
+    const readonly = this.props.readonly === 'true'
+    const props = { dates, readonly }
     this.html`${render(props)}`
   }
 })
 
 function render (props) {
-  const { dates } = props
+  const { dates, readonly } = props
   return html`
-    <div>
-      <button onclick=${addDate}>
-        Add date
-      </button>
-    </div>
-    <ol class='list-plain'>
-      ${dates.map(renderDate)}
-    </ol>
+    <dl>
+      <dt>Dates</dt>
+      <dd .hidden=${readonly}>
+        <button onclick=${addDate}>
+          Add date
+        </button>
+      </dd>
+      ${dates.map((date) => renderDate(props, date))}
+    </dl>
   `
 }
 
-function renderDate (props) {
-  const { startDate } = props
+function renderDate (props, date) {
+  const { readonly } = props
+  const { startDate } = date
   return html`
-    <li>
+    <dd>
       <span>
         ${startDate}
       </span>
       <button
-        onclick=${() => editDate(props)}>
+        .hidden=${readonly}
+        onclick=${() => editDate(date)}>
         Edit
       </button>
       <button
-        onclick=${() => removeDate(props)}>
+        .hidden=${readonly}
+        onclick=${() => removeDate(date)}>
         Remove
       </button>
-    </li>
+    </dd>
   `
 }
 

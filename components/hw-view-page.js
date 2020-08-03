@@ -8,7 +8,7 @@ if (pathname.endsWith('/')) pathname += 'index.html'
 
 define('hw-view-page', {
   style: selector => css`
-    ${selector} .main {
+    ${selector} .section {
       margin: 0 auto;
       max-width: 80rem;
       width: 100%;
@@ -90,52 +90,57 @@ function render (props) {
       icon=${icon}
       title=${title}
       unsaved=${unsaved} />
-    <main class='main padding-8'>
-      <div>
-        <button
-          class='button-icon'
-          onclick=${handleEditPageIcon(props)}>
-          ${icon}
-        </button>
-      </div>
-      <div class='padding-t-2'>
-        <h1
-          class='heading'
-          contenteditable=${deleted ? 'false' : 'true'}
-          .innerText=${rawTitle}
-          onblur=${handleEditPageTitleBlur(props)}
-          onkeydown=${handleEditPageTitleKeydown(props)}
-          placeholder=${defaultTitle}>
-        </h1>
-      </div>
-      <div class='content-area padding-t-4'>
-        <div
-          class='flex-basis-20 flex-grow'
-          .hidden=${deleted}>
-          <textarea
-            aria-label='Content'
-            class='editor-input'
-            id='editor-input'
-            oninput=${handleEditorInput}
-            placeholder='Enter content…'
-            rows='1'
-            .value=${editorValue}></textarea>
+    <main class='border-bottom padding-8'>
+      <div class='section'>
+        <div>
+          <button
+            class='button-icon'
+            onclick=${handleEditPageIcon(props)}>
+            ${icon}
+          </button>
         </div>
-        <article
-          class='content flex-basis-20 flex-grow'
-          id='content'>
-          ${html([content])}
-        </article>
+        <div class='padding-t-2'>
+          <h1
+            class='heading'
+            contenteditable=${deleted ? 'false' : 'true'}
+            .innerText=${rawTitle}
+            onblur=${handleEditPageTitleBlur(props)}
+            onkeydown=${handleEditPageTitleKeydown(props)}
+            placeholder=${defaultTitle}>
+          </h1>
+        </div>
+        <div class='content-area padding-t-4'>
+          <div
+            class='flex-basis-20 flex-grow'
+            .hidden=${deleted}>
+            <textarea
+              aria-label='Content'
+              class='editor-input'
+              id='editor-input'
+              oninput=${handleEditorInput}
+              placeholder='Enter content…'
+              rows='1'
+              .value=${editorValue}></textarea>
+          </div>
+          <article
+            class='content flex-basis-20 flex-grow'
+            id='content'>
+            ${html([content])}
+          </article>
+        </div>
       </div>
-      <div class='padding-t-4'>
-        <h2>Dates</h2>
-        <hw-dates />
-      </div>
-      <div class='content padding-t-4'>
+    </main>
+    <footer class='bg-black-0 padding-8'>
+      <div class='content section'>
+        <hw-dates
+          class='content'
+          readonly=${!!deleted} />
         <dl>
           <dt>Related pages</dt>
           ${linkRefsHTML}
-          <dd class='flex-gap-2'>
+          <dd
+            class='flex-gap-2'
+            .hidden=${!!deleted}>
             <button
               onclick=${handleAddRelatedPage}
               type='button'>
@@ -153,8 +158,8 @@ function render (props) {
           <dd .hidden=${!deleted}>🕓 ${displayDateTime(deleted)}</dt>
         </dl>
       </div>
-      <hw-lookup-popup id='lookup' />
-    </main>
+    </footer>
+    <hw-lookup-popup id='lookup' />
   `
 }
 
