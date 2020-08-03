@@ -8,6 +8,10 @@ define('hw-link', {
       text-decoration: none;
     }
 
+    ${selector} > .icon {
+      font-family: var(--font-code);
+    }
+
     ${selector} > .title {
       text-decoration: underline;
     }
@@ -27,7 +31,7 @@ define('hw-link', {
       }
       const { icon, title, url } = await getPage(entity)
       this.href = url
-      this.html`${icon} <span class='title'>${title}</span>`
+      this.html`<span class='icon'>${icon}</span><span class='title'>${title}</span>`
     } catch (e) {}
   }
 })

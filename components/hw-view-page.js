@@ -1,7 +1,7 @@
 import { css, define, html } from '../web_modules/uce.js'
 import { displayDateTime } from '../util/date.js'
 import { dispatch } from '../util/dom.js'
-import { getPage, updatePageTitle } from '../util/page.js'
+import { getPage, updatePageIcon, updatePageTitle } from '../util/page.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
@@ -58,9 +58,11 @@ define('hw-view-page', {
       outline: none;
     }
 
-    ${selector} .icon {
+    ${selector} .button-icon {
       font-size: var(--size-8);
+      height: inherit;
       line-height: var(--size-8);
+      padding: var(--size-0);
     }
   `,
   init () {
@@ -103,7 +105,13 @@ function render (props) {
       title=${title}
       unsaved=${unsaved} />
     <main class='main padding-8'>
-      <div class='icon'>${icon}</div>
+      <div>
+        <button
+          class='button-icon'
+          onclick=${handleEditPageIcon(props)}>
+          ${icon}
+        </button>
+      </div>
       <div class='padding-t-2'>
         <h1
           class='heading'
@@ -174,6 +182,15 @@ function handleEditorInput (event) {
   target.style.height = 0
   target.style.height = `${target.scrollHeight}px`
   dispatch('render')
+}
+
+function handleEditPageIcon (props) {
+  const { entity, rawIcon } = props
+  return async () => {
+    const result = prompt('Edit icon', rawIcon)
+    await updatePageIcon(entity, result)
+    dispatch('render')
+  }
 }
 
 async function handleEditPageTitle (props, event) {
