@@ -47,7 +47,7 @@ define('hw-view-page', {
     }
 
     ${selector} .editor-input:focus {
-      border-color: var(--color-blue-6);
+      border-color: var(--color-ix);
       outline: none;
     }
   `,

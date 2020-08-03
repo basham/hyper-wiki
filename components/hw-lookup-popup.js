@@ -37,7 +37,7 @@ define('hw-lookup-popup', {
     }
 
     ${selector} .popup__option[aria-selected="true"] {
-      background-color: var(--color-blue-6);
+      background-color: var(--color-ix);
       color: var(--color-white);
       cursor: pointer;
     }

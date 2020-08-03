@@ -12,22 +12,27 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/*
+ * Colors from: http://clrs.cc
+ * Derived colors from: https://codepen.io/basham/pen/OpNybO
+ */
 :root {
   --color-blue: #0074d9; /* 511/1000 */
   --color-blue-6: #0f6ac6; /* 550/1000 */
-  --color-blue-9: #18253f; /* 850/1000 */
 
-  --color-black: #000000;
-  --color-black-0: #f0f1f3; /* 50/1000 */
-  --color-black-1: #e1e2e6;
-  --color-black-2: #c4c6ce;
-  --color-black-3: #a8abb7;
-  --color-black-4: #8c90a0;
-  --color-black-5: #717789;
-  --color-black-6: #575e73;
-  --color-black-7: #3e465e;
-  --color-black-8: #253049;
-  --color-black-9: #0e111a; /* 950/1000 */
+  /* #111100 source color */
+  --color-black-0: #f1f1f0; /* 50/1000 */
+  --color-black-1: #e2e2e1;
+  --color-black-2: #c7c7c4;
+  --color-black-3: #ababa7;
+  --color-black-4: #91918b;
+  --color-black-5: #777771;
+  --color-black-6: #5f5f57;
+  --color-black-7: #47473f;
+  --color-black-8: #313128;
+  --color-black-9: #121201; /* 950/1000 */
+
+  --color-ix: var(--color-blue-6);
 
   --color-white: #ffffff;
 
@@ -65,7 +70,7 @@
 }
 
 :focus {
-  outline: var(--px-1) solid var(--color-blue-6);
+  outline: var(--px-1) solid var(--color-ix);
   outline-offset: var(--px-2);
 }
 
@@ -91,7 +96,7 @@
 }
 
 body {
-  color: var(--color-blue-9);
+  color: var(--color-black-9);
   font-family: var(--font-system);
   font-size: 100%;
   line-height: var(--size-3);
@@ -144,7 +149,7 @@ a:link {
 }
 
 a:hover {
-  color: var(--color-blue-6);
+  color: var(--color-ix);
 }
 
 dt {
@@ -229,7 +234,7 @@ button:hover {
 }
 
 button:focus {
-  border-color: var(--color-blue-6);
+  border-color: var(--color-ix);
   outline: none;
 }
 
@@ -270,7 +275,7 @@ input[type="text"] {
 
 input[type="search"]:focus,
 input[type="text"]:focus {
-  border-color: var(--color-blue-6);
+  border-color: var(--color-ix);
   outline: none;
 }
 
