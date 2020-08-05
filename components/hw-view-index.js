@@ -11,28 +11,56 @@ define('hw-view-index', {
 async function load () {
   const { title } = await beaker.hyperdrive.getInfo()
   const { active: activePages, deleted: inactivePages } = await getPages()
+  const pagesByDate = new Map()
+  const dates = new Map()
+  activePages.forEach((page) => {
+    page.dates.forEach((date) => {
+      const { rawStartDate: key } = date
+      dates.set(key, date)
+      if (!pagesByDate.has(key)) {
+        pagesByDate.set(key, new Set())
+      }
+      pagesByDate.get(key).add(page)
+    })
+  })
+  const groupedPagesByDate = [...dates.keys()]
+    .sort()
+    .reverse()
+    .map((key) => {
+      const title = dates.get(key).startDate
+      const pages = [...pagesByDate.get(key).values()]
+      return { title, pages }
+    })
+  const trashedPages = { title: 'Trash', pages: inactivePages }
+  const trashedPagesGroup = inactivePages.length ? [trashedPages] : []
+  const groupedPages = [
+    ...groupedPagesByDate,
+    ...trashedPagesGroup
+  ]
   return {
-    activePages,
-    inactivePages,
+    groupedPages,
     title
   }
 }
 
 function render (props) {
-  const { activePages, inactivePages, title } = props
+  const { groupedPages, title } = props
   return html`
     <hw-header />
     <main class='content padding-8'>
       <h1>${title}</h1>
-      <h2>Pages</h2>
-      <ul class='list-plain'>
-        ${activePages.map(renderPageLinkItem)}
-      </ul>
-      <h2>Trash</h2>
-      <ul class='list-plain'>
-        ${inactivePages.map(renderPageLinkItem)}
-      </ul>
+      ${groupedPages.map(renderGroup)}
     </main>
+  `
+}
+
+function renderGroup (props) {
+  const { title, pages } = props
+  return html`
+    <h2>${title}</h2>
+    <ul class='list-plain'>
+      ${pages.map(renderPageLinkItem)}
+    </ul>
   `
 }
 

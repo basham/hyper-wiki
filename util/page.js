@@ -1,4 +1,5 @@
 import cuid from '../web_modules/cuid.js'
+import { getDates } from './date.js'
 import { DATA_FOLDER, getDataPath, getEntityPath } from './entity.js'
 import { createStat, getStat, updateEntity } from './stat.js'
 import { PAGE_ICON, PAGE_TITLE } from '../constants.js'
@@ -33,6 +34,7 @@ export async function getPage (entity) {
   const file = await readPage(entity)
   const { content: rawContent = '', icon: rawIcon = '', title: rawTitle = '' } = file
   const stat = await getStat(entity)
+  const dates = await getDates(entity)
   const url = getEntityPath(entity)
   const defaultIcon = PAGE_ICON
   const defaultTitle = PAGE_TITLE
@@ -40,6 +42,7 @@ export async function getPage (entity) {
     ...file,
     ...stat,
     content: beaker.markdown.toHTML(rawContent),
+    dates,
     defaultIcon,
     defaultTitle,
     icon: rawIcon || PAGE_ICON,

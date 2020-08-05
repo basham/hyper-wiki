@@ -47,8 +47,7 @@ export async function getDate (path) {
   }
 }
 
-export async function getDates () {
-  const entity = getEntityId()
+export async function getDates (entity = getEntityId()) {
   const results = await beaker.hyperdrive.query({
     path: `${DATA_FOLDER}/${entity}/*.${FILE_NAME}`,
     type: 'file'
