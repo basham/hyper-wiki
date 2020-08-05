@@ -178,6 +178,11 @@ ul {
   margin-top: var(--size-3);
 }
 
+.content dd,
+.content li {
+  margin-top: var(--size-1);
+}
+
 .content > :first-child {
   margin-top: 0;
 }

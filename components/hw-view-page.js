@@ -138,9 +138,7 @@ function render (props) {
         <dl>
           <dt>Related pages</dt>
           ${linkRefsHTML}
-          <dd
-            class='flex-gap-2'
-            .hidden=${!!deleted}>
+          <dd .hidden=${!!deleted}>
             <button
               onclick=${handleAddRelatedPage}
               type='button'>

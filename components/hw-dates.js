@@ -29,6 +29,7 @@ function render (props) {
       <dt>Dates</dt>
       <dd .hidden=${readonly}>
         <button onclick=${addDate}>
+          <hw-icon name='plus' />
           Add date
         </button>
       </dd>
