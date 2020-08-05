@@ -22,7 +22,7 @@ function render (props) {
   const { activePages, inactivePages, title } = props
   return html`
     <hw-header />
-    <main class='page padding-8'>
+    <main class='content padding-8'>
       <h1>${title}</h1>
       <h2>Pages</h2>
       <ul class='list-plain'>

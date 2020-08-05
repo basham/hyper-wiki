@@ -306,6 +306,7 @@ input[type="text"]:focus {
 
 .list-plain {
   list-style-type: none;
+  margin-left: 0 !important;
 }
 
 .list-pagination li:not(:last-child)::after {
