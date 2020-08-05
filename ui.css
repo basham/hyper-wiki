@@ -108,6 +108,29 @@ body {
   padding: 0;
 }
 
+a:link {
+  color: var(--color-black);
+}
+
+a:hover {
+  color: var(--color-ix);
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd,
+dl,
+hr,
+ol,
+p,
+pre,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
 .content h1 {
   font-size: var(--size-4);
   line-height: var(--size-5);
@@ -152,29 +175,6 @@ body {
   padding-left: var(--size-3);
 }
 
-a:link {
-  color: var(--color-black);
-}
-
-a:hover {
-  color: var(--color-ix);
-}
-
-dt {
-  font-weight: bold;
-}
-
-dd,
-dl,
-hr,
-ol,
-p,
-pre,
-ul {
-  margin: 0;
-  padding: 0;
-}
-
 .content dl,
 .content dt ~ dt,
 .content hr,
@@ -184,6 +184,18 @@ ul {
 .content table,
 .content ul {
   margin-top: var(--size-3);
+}
+
+.content ol ol,
+.content ol ul,
+.content ul ol,
+.content ul ul {
+  margin-top: 0;
+}
+
+.content ol,
+.content ul {
+  margin-left: var(--size-3);
 }
 
 .content dd,
