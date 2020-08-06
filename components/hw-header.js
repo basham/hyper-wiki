@@ -41,7 +41,7 @@ function render (props) {
         <nav
           aria-label='Breadcrumbs'
           class='flex-grow'>
-          <ol class='list-plain list-pagination flex-middle flex-wrap lh-4 padding-1'>
+          <ol class='list-plain list-pagination flex-middle flex-wrap lh-3 padding-1'>
             <li>
               <a is='hw-link'>${driveTitle}</a>
             </li>

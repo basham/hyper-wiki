@@ -22,8 +22,8 @@ define('hw-view-page', {
     }
 
     ${selector} .heading {
-      font-size: var(--size-5);
-      line-height: var(--size-6);
+      font-size: var(--ts-5);
+      line-height: var(--lh-5);
       margin: 0;
       padding: 0;
     }

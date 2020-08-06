@@ -58,12 +58,18 @@
   --size-8: 4rem;
 
   --ts-0: calc(14rem/16);
-  --ts-1: 1rem;
-  --ts-2: calc(20rem/16);
+  --ts-1: var(--size-2);
+  --ts-2: 1.25rem;
+  --ts-3: var(--size-3);
+  --ts-4: var(--size-4);
+  --ts-5: var(--size-5);
 
   --lh-0: calc(20rem/16);
   --lh-1: var(--size-3);
-  --lh-2: calc(28rem/16);
+  --lh-2: 1.75rem;
+  --lh-3: var(--size-4);
+  --lh-4: var(--size-5);
+  --lh-5: var(--size-6);
 
   --border: var(--px-1) solid var(--color-black-1);
   --border-4: var(--size-0) solid var(--color-black-1);
@@ -103,7 +109,7 @@ body {
   color: var(--color-black-9);
   font-family: var(--font-system);
   font-size: 100%;
-  line-height: var(--size-3);
+  line-height: var(--lh-1);
   margin: 0;
   padding: 0;
 }
@@ -132,16 +138,16 @@ ul {
 }
 
 .content h1 {
-  font-size: var(--size-4);
-  line-height: var(--size-5);
-  margin: var(--size-5) 0 0;
+  font-size: var(--ts-4);
+  line-height: var(--lh-4);
+  margin: var(--lh-5) 0 0;
   padding: 0;
 }
 
 .content h2 {
-  font-size: var(--size-3);
-  line-height: var(--size-4);
-  margin: var(--size-4) 0 0;
+  font-size: var(--ts-3);
+  line-height: var(--lh-3);
+  margin: var(--lh-4) 0 0;
   padding: 0;
 }
 
@@ -149,9 +155,9 @@ ul {
 .content h4,
 .content h5,
 .content h6 {
-  font-size: var(--size-2);
-  line-height: var(--size-3);
-  margin: var(--size-3) 0 0;
+  font-size: var(--ts-2);
+  line-height: var(--lh-2);
+  margin: var(--lh-3) 0 0;
   padding: 0;
 }
 
@@ -172,7 +178,7 @@ ul {
 .content blockquote {
   border-left: var(--border-4);
   margin: 0;
-  padding-left: var(--size-3);
+  padding-left: calc(var(--size-3) - var(--size-0));
 }
 
 .content dl,
@@ -183,7 +189,7 @@ ul {
 .content pre,
 .content table,
 .content ul {
-  margin-top: var(--size-3);
+  margin-top: var(--size-2);
 }
 
 .content ol ol,
@@ -246,7 +252,7 @@ button {
   display: inline-flex;
   flex-shrink: 0;
   font-family: inherit;
-  font-size: var(--size-2);
+  font-size: var(--ts-1);
   height: var(--size-4);
   padding: 0 var(--size-1);
   white-space: nowrap;
@@ -412,11 +418,7 @@ input[type="text"]:focus {
 }
 
 .lh-3 {
-  line-height: var(--size-3);
-}
-
-.lh-4 {
-  line-height: var(--size-4);
+  line-height: var(--lh-3);
 }
 
 .no-pointer-events {

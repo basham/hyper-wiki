@@ -129,7 +129,7 @@ define('hw-lookup-popup', {
           onsubmit=${this.handleFormSubmit.bind(this)}
           tabindex='-1'>
           <div class='flex'>
-            <h1 class='flex-grow fs-2 lh-4 padding-1'>
+            <h1 class='flex-grow fs-2 lh-3 padding-1'>
               <label
                 for=${inputId}
                 id=${labelId}>
@@ -175,7 +175,7 @@ define('hw-lookup-popup', {
             ${this._options.map(renderOption.bind(this))}
           </ul>
           <div
-            class='popup__empty lh-4'
+            class='popup__empty lh-3'
             .hidden=${this._hasOptions}>
             No results
           </div>
