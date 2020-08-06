@@ -35,5 +35,10 @@ define('hw-link', {
       this.href = url
       this.html`<span class='icon'>${icon}</span><span class='title'>${title}</span>`
     } catch (e) {}
+  },
+  onclick (event) {
+    event.preventDefault()
+    history.pushState({}, '', this.href)
+    this.dispatchEvent(new CustomEvent('refresh', { bubbles: true }))
   }
 })

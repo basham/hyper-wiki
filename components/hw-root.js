@@ -16,8 +16,8 @@ define('hw-root', {
   async init () {
     this.loadingChildren = new Set()
     this.debounceLoadedCheck = debounce(this.loadedCheck.bind(this), 100)
-    const props = await load()
-    this.html`${render(props)}`
+    await this.render()
+    window.addEventListener('popstate', this.onrefresh.bind(this))
   },
   onloading (event) {
     this.loadingChildren.add(event.target)
@@ -30,6 +30,14 @@ define('hw-root', {
     if (this.loadingChildren.size === 0) {
       this.setAttribute('loaded', '')
     }
+  },
+  onrefresh () {
+    this.removeAttribute('loaded')
+    this.render()
+  },
+  async render () {
+    const props = await load()
+    this.html`${render(props)}`
   }
 })
 
