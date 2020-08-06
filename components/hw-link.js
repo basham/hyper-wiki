@@ -17,8 +17,10 @@ define('hw-link', {
     }
   `,
   async init () {
-    this.render()
+    this.dispatchEvent(new CustomEvent('loading', { bubbles: true }))
+    await this.render()
     document.addEventListener('render', this.render.bind(this))
+    this.dispatchEvent(new CustomEvent('loaded', { bubbles: true }))
   },
   async render () {
     try {

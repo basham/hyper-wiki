@@ -3,8 +3,10 @@ import { getPages } from '../util/page.js'
 
 define('hw-view-index', {
   async init () {
+    this.dispatchEvent(new CustomEvent('loading', { bubbles: true }))
     const props = await load()
     this.html`${render(props)}`
+    this.dispatchEvent(new CustomEvent('loaded', { bubbles: true }))
   }
 })
 

@@ -51,9 +51,11 @@ define('hw-view-page', {
       outline: none;
     }
   `,
-  init () {
+  async init () {
+    this.dispatchEvent(new CustomEvent('loading', { bubbles: true }))
     document.addEventListener('render', this.render.bind(this))
-    this.render()
+    await this.render()
+    this.dispatchEvent(new CustomEvent('loaded', { bubbles: true }))
   },
   async render () {
     const props = await load()

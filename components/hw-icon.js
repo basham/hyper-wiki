@@ -20,7 +20,9 @@ define('hw-icon', {
     }
   `,
   init () {
+    this.dispatchEvent(new CustomEvent('loading', { bubbles: true }))
     const href = `${sprites}#${this.props.name}`
     this.html`<svg aria-hidden='true'><use href=${href}/></svg>`
+    this.dispatchEvent(new CustomEvent('loaded', { bubbles: true }))
   }
 })

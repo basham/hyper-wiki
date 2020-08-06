@@ -1,14 +1,12 @@
-import { css, define, html } from '../web_modules/uce.js'
+import { define, html } from '../web_modules/uce.js'
 import { getDates, createDate, deleteDate, formatDate, isDateValid, updateDate } from '../util/date.js'
 
 define('hw-dates', {
-  style: selector => css`
-    ${selector} {
-    }
-  `,
-  init () {
-    this.render()
+  async init () {
+    this.dispatchEvent(new CustomEvent('loading', { bubbles: true }))
+    await this.render()
     document.addEventListener('dates-updated', this.render.bind(this))
+    this.dispatchEvent(new CustomEvent('loaded', { bubbles: true }))
   },
   observedAttributes: ['readonly'],
   attributeChanged () {

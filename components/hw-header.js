@@ -4,8 +4,10 @@ import { createPage, updatePageContent } from '../util/page.js'
 import { deleteEntity, restoreEntity } from '../util/stat.js'
 
 define('hw-header', {
-  init () {
-    this.render()
+  async init () {
+    this.dispatchEvent(new CustomEvent('loading', { bubbles: true }))
+    await this.render()
+    this.dispatchEvent(new CustomEvent('loaded', { bubbles: true }))
   },
   observedAttributes: ['deleted', 'entity', 'icon', 'title', 'unsaved'],
   attributeChanged () {
