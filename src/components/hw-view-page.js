@@ -2,6 +2,7 @@ import { css, define, html } from '../web_modules/uce.js'
 import { displayDateTime } from '../util/date.js'
 import { className, dispatch } from '../util/dom.js'
 import { getPage, updatePageIcon, updatePageTitle } from '../util/page.js'
+import { debounce } from '../util/operators.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
@@ -184,9 +185,13 @@ function resizeEditor () {
   }
 }
 
-function handleEditorInput () {
+const debouncedEditorInput = debounce(() => {
   resizeEditor()
   dispatch('render')
+}, 250)
+
+function handleEditorInput () {
+  debouncedEditorInput()
 }
 
 function handleEditPageIcon (props) {
