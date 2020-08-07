@@ -19,8 +19,7 @@
 :root {
   --color-blue: #0074d9; /* 511/1000 */
   --color-blue-6: #0f6ac6; /* 550/1000 */
-
-  /* #111100 source color */
+  /* #111100 black source color */
   --color-black-0: #f1f1f0; /* 50/1000 */
   --color-black-1: #e2e2e1;
   --color-black-2: #c7c7c4;
@@ -31,13 +30,11 @@
   --color-black-7: #47473f;
   --color-black-8: #313128;
   --color-black-9: #121201; /* 950/1000 */
-
   --color-olive: #3d9970;
-
+  --color-red: #ff4136;
+  --color-yellow: #ffdc00;
   --color-ix: var(--color-blue-6);
-
   --color-white: #ffffff;
-
   --color-shadow-1: rgba(0, 0, 0, 0.25);
 
   --font-code: Recursive, Consolas, 'Lucida Console', Monaco, monospace;
@@ -218,6 +215,19 @@ ul {
   margin-top: 0;
 }
 
+del,
+s {
+  color: var(--color-red);
+}
+
+ins {
+  color: var(--color-olive);
+}
+
+mark {
+  background-color: var(--color-yellow);
+}
+
 code {
   background-color: var(--color-black-0);
   border-radius: var(--size-0);
@@ -240,6 +250,7 @@ pre {
 
 pre code {
   color: inherit;
+  padding: 0;
 }
 
 table {
