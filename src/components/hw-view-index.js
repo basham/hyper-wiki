@@ -14,8 +14,13 @@ async function load () {
   const { title } = await beaker.hyperdrive.getInfo()
   const { active: activePages, deleted: inactivePages } = await getPages()
   const pagesByDate = new Map()
+  const pagesWithoutDates = new Set()
   const dates = new Map()
   activePages.forEach((page) => {
+    if (!page.dates.length) {
+      pagesWithoutDates.add(page)
+      return
+    }
     page.dates.forEach((date) => {
       const { rawStartDate: key } = date
       dates.set(key, date)
@@ -33,10 +38,13 @@ async function load () {
       const pages = [...pagesByDate.get(key).values()]
       return { title, pages }
     })
+  const otherPages = { title: 'Pages', pages: [...pagesWithoutDates.values()] }
+  const otherPagesGroup = pagesWithoutDates.size ? [otherPages] : []
   const trashedPages = { title: 'Trash', pages: inactivePages }
   const trashedPagesGroup = inactivePages.length ? [trashedPages] : []
   const groupedPages = [
     ...groupedPagesByDate,
+    ...otherPagesGroup,
     ...trashedPagesGroup
   ]
   return {
