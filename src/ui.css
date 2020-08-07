@@ -32,6 +32,8 @@
   --color-black-8: #313128;
   --color-black-9: #121201; /* 950/1000 */
 
+  --color-olive: #3d9970;
+
   --color-ix: var(--color-blue-6);
 
   --color-white: #ffffff;
@@ -216,6 +218,11 @@ ul {
   margin-top: 0;
 }
 
+code {
+  background-color: var(--color-black-0);
+  color: var(--color-olive);
+}
+
 code,
 textarea {
   font-family: var(--font-code);
@@ -227,6 +234,10 @@ pre {
   border-radius: var(--size-0);
   overflow: scroll;
   padding: var(--size-2);
+}
+
+pre code {
+  color: inherit;
 }
 
 table {
