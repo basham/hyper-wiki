@@ -38,7 +38,7 @@ function render (props) {
   const { deleted = false, driveTitle, entity = false, unsaved } = props
   updateDocumentHead(props)
   return html`
-    <header class='header'>
+    <header>
       <div class='flex flex-middle flex-wrap border-bottom padding-1'>
         <nav
           aria-label='Breadcrumbs'

@@ -1,40 +1,43 @@
 import { css, define, html } from '../web_modules/uce.js'
 import { displayDateTime } from '../util/date.js'
-import { dispatch } from '../util/dom.js'
+import { className, dispatch } from '../util/dom.js'
 import { getPage, updatePageIcon, updatePageTitle } from '../util/page.js'
 
 let pathname = location.pathname
 if (pathname.endsWith('/')) pathname += 'index.html'
 
-define('hw-view-page', {
-  style: selector => css`
-    ${selector} .section {
+const NAME = 'hw-view-page'
+const cn = className(NAME)
+
+define(NAME, {
+  style: () => css`
+    .${cn('section')} {
       margin: 0 auto;
       max-width: 80rem;
       width: 100%;
     }
 
-    ${selector} .button-icon {
+    .${cn('icon')} {
       font-size: var(--size-8);
       height: inherit;
       line-height: var(--size-8);
       padding: var(--size-0);
     }
 
-    ${selector} .heading {
+    .${cn('heading')} {
       font-size: var(--ts-5);
       line-height: var(--lh-5);
       margin: 0;
       padding: 0;
     }
 
-    ${selector} .content-area {
+    .${cn('content')} {
       display: grid;
       gap: var(--size-8);
       grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
     }
 
-    ${selector} .editor-input {
+    .${cn('editor-input')} {
       background-color: transparent;
       border: var(--border);
       border-radius: var(--size-0);
@@ -46,7 +49,7 @@ define('hw-view-page', {
       width: 100%;
     }
 
-    ${selector} .editor-input:focus {
+    .${cn('editor-input')}:focus {
       border-color: var(--color-ix);
       outline: none;
     }
@@ -93,17 +96,17 @@ function render (props) {
       title=${title}
       unsaved=${unsaved} />
     <main class='border-bottom padding-8'>
-      <div class='section'>
+      <div class=${cn('section')}>
         <div>
           <button
-            class='button-icon'
+            class=${cn('icon', 'button-icon')}
             onclick=${handleEditPageIcon(props)}>
             ${icon}
           </button>
         </div>
         <div class='padding-t-2'>
           <h1
-            class='heading'
+            class=${cn('heading')}
             contenteditable=${deleted ? 'false' : 'true'}
             .innerText=${rawTitle}
             onblur=${handleEditPageTitleBlur(props)}
@@ -111,13 +114,13 @@ function render (props) {
             placeholder=${defaultTitle}>
           </h1>
         </div>
-        <div class='content-area padding-t-4'>
+        <div class=${cn('content', 'padding-t-4')}>
           <div
             class='flex-basis-20 flex-grow'
             .hidden=${deleted}>
             <textarea
               aria-label='Content'
-              class='editor-input'
+              class=${cn('editor-input')}
               id='editor-input'
               oninput=${handleEditorInput}
               placeholder='Enter content…'

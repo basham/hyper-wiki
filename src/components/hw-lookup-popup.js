@@ -1,11 +1,15 @@
 import cuid from '../web_modules/cuid.js'
 import { css, define, html } from '../web_modules/uce.js'
 import { FOCUSABLE_ELEMENTS, MAX_RESULTS } from '../constants.js'
+import { className } from '../util/dom.js'
 import { getPages } from '../util/page.js'
 
-define('hw-lookup-popup', {
-  style: (selector) => css`
-    ${selector} .popup {
+const NAME = 'hw-lookup-popup'
+const cn = className(NAME)
+
+define(NAME, {
+  style: () => css`
+    .${cn('popup')} {
       height: 100vh;
       left: 0;
       overflow: auto;
@@ -15,7 +19,7 @@ define('hw-lookup-popup', {
       z-index: 1;
     }
 
-    ${selector} .popup__form {
+    .${cn('form')} {
       background-color: var(--color-white);
       box-shadow:
         0 var(--px-1) 0 0 var(--color-black-2),
@@ -24,29 +28,29 @@ define('hw-lookup-popup', {
       max-width: 40rem;
     }
 
-    ${selector} .popup__icon {
+    .${cn('icon')} {
       --icon-size: var(--size-3);
       left: var(--size-1);
       position: absolute;
       top: var(--size-1);
     }
 
-    ${selector} .popup__option {
+    .${cn('option')} {
       line-height: var(--px-20);
       padding: var(--px-6) var(--size-2);
     }
 
-    ${selector} .popup__option[aria-selected="true"] {
+    .${cn('option[aria-selected="true"]')} {
       background-color: var(--color-ix);
       color: var(--color-white);
       cursor: pointer;
     }
 
-    ${selector} .popup__option[aria-selected="true"] .popup__option-small {
+    .${cn('option[aria-selected="true"]')} .${cn('option-small')} {
       color: var(--color-white);
     }
 
-    ${selector} .popup__empty {
+    .${cn('empty')} {
       padding: var(--size-1) var(--size-1) var(--size-1) var(--size-6);
     }
   `,
@@ -119,12 +123,12 @@ define('hw-lookup-popup', {
     this.html`
       <div
         aria-labelledby=${labelId}
-        class='popup'
+        class=${cn('popup')}
         id=${backdropId}
         onclick=${this.cancelByContainer.bind(this)}
         role='dialog'>
         <form
-          class='popup__form padding-1'
+          class=${cn('form', 'padding-1')}
           onkeydown=${this.handleTrapFocus.bind(this)}
           onsubmit=${this.handleFormSubmit.bind(this)}
           tabindex='-1'>
@@ -153,7 +157,7 @@ define('hw-lookup-popup', {
             class='padding-1 pos-rel'
             role='combobox'>
             <hw-icon
-              class='popup__icon color-text-light padding-1'
+              class=${cn('icon', 'color-text-light padding-1')}
               name='search' />
             <input
               aria-activedescendant=${selectedId}
@@ -175,7 +179,7 @@ define('hw-lookup-popup', {
             ${this._options.map(renderOption.bind(this))}
           </ul>
           <div
-            class='popup__empty lh-3'
+            class=${cn('empty', 'lh-3')}
             .hidden=${this._hasOptions}>
             No results
           </div>
@@ -263,7 +267,7 @@ function renderOption (props, index) {
   return html`
     <li
       aria-selected=${selected}
-      class='popup__option border-radius flex'
+      class=${cn('option', 'border-radius flex')}
       data-index=${index}
       onclick=${this.handleOptionClick.bind(this)}
       onmouseover=${this.handleOptionMouseOver.bind(this)}
@@ -284,7 +288,7 @@ function renderParent (props) {
   }
   const { title } = parentPage
   return html`
-    <span class='popup__option-small color-text-light flex fs-0'>
+    <span class=${cn('option-small', 'color-text-light flex fs-0')}>
       <span class='padding-lr-1'>&mdash;</span>
       <span>${title}</span>
     </span>

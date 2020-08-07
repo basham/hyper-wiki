@@ -4,7 +4,7 @@ import { debounce } from '../util/operators.js'
 import { hasStat } from '../util/stat.js'
 
 define('hw-root', {
-  style: selector => css`
+  style: (selector) => css`
   ${selector} {
     visibility: hidden;
   }
